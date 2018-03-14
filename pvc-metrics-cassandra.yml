@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  annotations:
+  labels:
+    metrics-infra: hawkular-cassandra
+  name: metrics-cassandra-1
+  namespace: openshift-infra
+spec:
+  storageClassName: glusterfs-storage
+  accessModes:
+  - ReadWriteOnce
+  resources:
+    requests:
+      storage: 20Gi
