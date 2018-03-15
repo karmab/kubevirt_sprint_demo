@@ -90,6 +90,7 @@ firewall-cmd --reload
 ## Lessons learnt
 
 - better to run the main playbook for openshift and then dedicated one for gluster and metrics
+- make sure you have all the relevant links for testing of all components
 
 ## Problems?
 

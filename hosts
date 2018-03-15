@@ -20,6 +20,7 @@ openshift_image_tag=[[ openshift_image_tag ]]
 openshift_repos_enable_testing=True
 openshift_storage_glusterfs_namespace=app-storage
 openshift_storage_glusterfs_storageclass=true
+openshift_storageclass_default=true
 openshift_storage_glusterfs_block_deploy=false
 [% if metrics %]
 openshift_metrics_install_metrics=true
