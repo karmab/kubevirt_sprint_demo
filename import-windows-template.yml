@@ -1,0 +1,48 @@
+apiVersion: v1
+kind: Template
+metadata:
+  name: kubevirt-import-disk-template
+  annotations:
+    description: "Kubevirt Disk importer"
+    tags: "kubevirt,ocp,template,disk,import"
+objects:
+-  kind: PersistentVolumeClaim
+   apiVersion: v1
+   metadata:
+     name: ${NAME}
+   spec:
+     storageClassName: glusterfs-storage
+     accessModes:
+       - ReadWriteOnce
+     resources:
+       requests:
+         storage: 51Gi
+-  Version: v1
+   kind: Pod
+   metadata:
+     name: windows-importer-${NAME}
+   spec:
+     restartPolicy: OnFailure
+     containers:
+     - name: importer
+       image: kubevirtci/disk-importer
+       env:
+         - name: CURL_OPTS
+           value: "-L"
+         - name: INSTALL_TO
+           value: /storage/disk.img
+         - name: URL
+           value: ${URL}
+       volumeMounts:
+       - name: storage
+         mountPath: /storage
+     volumes:
+     - name: storage
+       persistentVolumeClaim:
+         claimName: ${NAME}
+parameters:
+- name: NAME
+  description: Name for the new VM
+- name: URL
+  description: URL to fetch
+  value: http://10.19.139.34/windows/win-test.raw

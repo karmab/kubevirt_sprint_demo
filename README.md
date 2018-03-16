@@ -4,7 +4,9 @@ This repo holds details for the demo of the current sprint work in kubevirt
 
 - deploy openshift3.9 on 3 nodes with metrics and cns
 - deploy kubevirt using an unified apb (pulling from kubevirt-ansible repo) and deploying an extra storage class
-- launch a kubevirt windows vm from windows vm apb (using an underlying template)
+- install a window template
+- launch a kubevirt windows vm instanciating the template
+- change the status of the offlinevirtualmachine so it launches a vm
 - access a web service exposed on the vm
 
 ### Infra
@@ -70,7 +72,56 @@ this is needed for the pod hawkular-cassandra and the metrics-cassandra-1 pvc
 
 - we also disable selinux on all the nodes in order to be able to launch vms and install virtctl. For this task, the playbook [post.yml](post.yml) can be used, against the same inventory
 
+## 
+
 # Testing
+
+## import cirros image with a dedicated [disk-importer pod](import-windows.yml)
+
+```
+oc create -f import-cirros.yml
+```
+
+## import windows image with a [disk-importer pod](import-windows.yml)
+
+```
+oc create -f import-windows.yml
+```
+
+alternatively we can install [disk import template](import-windows-template.yml)
+
+```
+oc create -f import-windows-template.yml -n openshift
+```
+
+- install [windows template](windows-template.yml)
+
+```
+oc create -f windows-template.yml -n openshift
+```
+
+- deploy a windows vm using template from the openshift UI ( and specifying an existing PVC_NAME)
+
+- check offlinevirtualmachine is there 
+
+```
+oc get ovm -n default
+```
+
+- patch offlinevirtualmachine so vm gets started
+
+```
+NAME=vm1; oc patch offlinevirtualmachine $NAME --type=merge -p '{"spec":{"running": true}}'
+```
+
+
+## NOT COVERED YET
+
+- expose svc 
+
+```
+oc expose pod virt-launcher-vm1-ephemeral-bbpbp --port=80 --name=mytest --type=LoadBalancer
+```
 
 # Additional information
 
