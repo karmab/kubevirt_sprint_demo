@@ -45,8 +45,8 @@ openshift_master_identity_providers=[{'name': 'htpasswd_auth', 'login': 'true', 
 openshift_master_cluster_method=native
 openshift_master_cluster_hostname=master01.[[ domain ]]
 openshift_master_cluster_public_hostname=master01.[[ domain ]]
-openshift_router_selector="region=infra"
-openshift_registry_selector="region=infra"
+openshift_router_selector="region=master"
+openshift_registry_selector="region=master"
 os_sdn_network_plugin_name='redhat/openshift-ovs-multitenant'
 #openshift_hosted_router_replicas="1"
 ansible_service_broker_registry_whitelist=['.*-apb$']

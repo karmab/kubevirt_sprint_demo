@@ -1,0 +1,12 @@
+windows:
+  iso: 14393.0.161119-1705.RS1_REFRESH_SERVER_EVAL_X64FRE_EN-US.iso
+  memory: 8192
+  numcpus: 2
+  nets: 
+   - name: default
+     type: rtl8139
+  pool: default
+  cloudinit: false
+  disks:
+    - size: 30
+      interface: ide

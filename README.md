@@ -45,7 +45,7 @@ kcli plan kubecns
 
 ### openshift deployment
 
-- to deploy openshift with cns, we run the playbook with this [inventory file](hosts)
+- to deploy openshift with cns, we run the playbook with this [inventory file](hosts.sample)
 
 ```
 ansible-playbook -i /root/hosts /root/openshift-ansible/playbooks/prerequisites.yml
@@ -123,6 +123,19 @@ NAME=vm1; oc patch offlinevirtualmachine $NAME --type=merge -p '{"spec":{"runnin
 oc expose pod virt-launcher-vm1-ephemeral-bbpbp --port=80 --name=mytest --type=LoadBalancer
 ```
 
+```
+NAME="vm1"
+oc expose `oc get pod -l kubevirt.io/domain=$NAME -o name` --port=22 --name=$NAME-ssh
+```
+
+for web
+
+```
+NAME="vm1"
+oc expose `oc get pod -l kubevirt.io/domain=$NAME -o name` --port=80 --name=$NAME-web
+oc expose svc --hostname=wingtiptoys.10.19.139.31.xip.io $NAME-web
+```
+
 # Additional information
 
 ## Serve windows image from a given node
@@ -136,6 +149,12 @@ systemct enable httpd
 systemctl start httpd
 firewall-cmd --zone=public --add-port=80/tcp --permanent
 firewall-cmd --reload
+```
+
+## Delete completed pods
+
+```
+oc get pods --field-selector=status.phase!=Running -o name | xargs oc delete
 ```
 
 ## Lessons learnt
