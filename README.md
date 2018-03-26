@@ -23,7 +23,7 @@ This repo holds details for the demo of the current sprint work in kubevirt
 
 ### openshift
 
-- nodes were provisioned with rhel7.4 using a dedicated satellite and subscribed to the extras channel.
+- nodes were provisioned with centos cloud image
 
 - to deploy openshift with cns, we run the playbook with this [inventory file](hosts)
 
