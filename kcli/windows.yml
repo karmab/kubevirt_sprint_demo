@@ -1,0 +1,23 @@
+windows2:
+  memory: 8192
+  pool: glusterfs-storage
+  cloudinit: false
+  cpumodel: q35
+  cpuflags:
+  - acpi
+  - apic
+  - hyperv:
+     relaxed:
+      enabled: true
+     spinlocks:
+      enabled: true
+      spinlocks: 8191
+     vapic:
+      enabled: true
+  numcpus: 2
+  nets: 
+   - name: default
+  disks:
+   - size: 30
+     interface: sata
+     name: windows-pvc-vm2

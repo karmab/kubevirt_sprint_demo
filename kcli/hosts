@@ -1,0 +1,103 @@
+# Create an OSEv3 group that contains the master, nodes, etcd, and lb groups.
+# The lb group lets Ansible configure HAProxy as the load balancing solution.
+# Comment lb out if your load balancer is pre-configured.
+[OSEv3:children]
+masters
+nodes
+etcd
+lb
+glusterfs
+
+# Set variables common for all OSEv3 hosts
+[OSEv3:vars]
+deployment_type=origin
+ansible_ssh_user=centos
+ansible_become=True
+openshift_disable_check=disk_availability,docker_storage,memory_availability,package_availability,docker_image_availability
+enable_excluders=false
+containerized=true
+openshift_image_tag=[[ openshift_image_tag ]]
+openshift_repos_enable_testing=True
+openshift_storage_glusterfs_namespace=app-storage
+openshift_storage_glusterfs_storageclass=true
+openshift_storageclass_default=true
+openshift_storage_glusterfs_block_deploy=false
+[% if metrics %]
+openshift_metrics_install_metrics=true
+openshift_metrics_storage_kind=nfs
+openshift_metrics_storage_access_modes=['ReadWriteOnce']
+openshift_metrics_storage_nfs_directory=/opt/metrics-vol
+openshift_metrics_storage_nfs_options='*(rw,root_squash)'
+openshift_metrics_storage_volume_name=metrics
+openshift_metrics_storage_volume_size=10Gi
+[% endif %]
+
+# Uncomment the following to enable htpasswd authentication; defaults to
+# DenyAllPasswordIdentityProvider.
+openshift_master_identity_providers=[{'name': 'htpasswd_auth', 'login': 'true', 'challenge': 'true', 'kind': 'HTPasswdPasswordIdentityProvider', 'filename': '/etc/origin/master/htpasswd'}]
+
+# Native high availbility cluster method with optional load balancer.
+# If no lb group is defined installer assumes that a load balancer has
+# been preconfigured. For installation the value of
+# openshift_master_cluster_hostname must resolve to the load balancer
+# or to one or all of the masters defined in the inventory if no load
+# balancer is present.
+openshift_master_cluster_method=native
+openshift_master_cluster_hostname=master01.[[ domain ]]
+openshift_master_cluster_public_hostname=master01.[[ domain ]]
+openshift_router_selector="region=master"
+openshift_registry_selector="region=master"
+os_sdn_network_plugin_name='redhat/openshift-ovs-multitenant'
+#openshift_hosted_router_replicas="1"
+ansible_service_broker_registry_whitelist=['.*-apb$']
+openshift_hosted_etcd_storage_kind=nfs
+openshift_hosted_etcd_storage_nfs_options="*(rw,root_squash,sync,no_wdelay)"
+openshift_hosted_etcd_storage_nfs_directory=/opt/etcd-vol
+openshift_hosted_etcd_storage_volume_name=etcd-vol
+openshift_hosted_etcd_storage_access_modes=["ReadWriteOnce"]
+openshift_hosted_etcd_storage_volume_size=1G
+openshift_hosted_etcd_storage_labels={'storage': 'etcd'}
+
+# apply updated node defaults
+openshift_node_kubelet_args={'pods-per-core': ['10'], 'max-pods': ['250'], 'image-gc-high-threshold': ['90'], 'image-gc-low-threshold': ['80']}
+
+# override the default controller lease ttl
+#osm_controller_lease_ttl=30
+
+# enable ntp on masters to ensure proper failover
+openshift_clock_enabled=true
+[% if not metrics %]
+openshift_hosted_metrics_deploy=false
+[% endif %]
+openshift_master_default_subdomain=apps.[[ domain ]]
+
+[nfs]
+master01.[[ domain ]]
+
+# host group for masters
+[masters]
+master01.[[ domain ]]
+
+
+# host group for etcd
+[etcd]
+master01.[[ domain ]]
+
+[lb]
+
+[glusterfs]
+master01.[[ domain ]] glusterfs_devices='[ "/dev/vdc" ]'
+[% for node in range(0, nodes) %]
+node0[[ node +1 ]].[[ domain ]] glusterfs_devices='[ "/dev/vdc" ]'
+[% endfor %]
+
+# host group for nodes, includes region info
+[nodes]
+master01.[[ domain ]] openshift_node_labels="{'region': 'master', 'zone': 'default'}"
+[% for node in range(0, nodes) %]
+[% if node == 0 %]
+node0[[ node +1 ]].[[ domain ]] openshift_node_labels="{'region': 'infra', 'zone': 'default'}"
+[% else %]
+node0[[ node +1 ]].[[ domain ]] openshift_node_labels="{'region': 'primary', 'zone': 'east'}"
+[% endif %]
+[% endfor %]

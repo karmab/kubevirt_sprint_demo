@@ -1,12 +1,12 @@
 apiVersion: v1
 kind: Template
 metadata:
-  name: kubevirt-windows2012r2-vm-template
+  name: kubevirt-windows2016-vm-template
   annotations:
-    description: "OCP KubeVirt Microsoft Windows Server 2012 R2 VM template"
+    description: "OCP KubeVirt Microsoft Windows Server 2016 VM template"
     tags: "kubevirt,ocp,template,windows"
   labels:
-    kubevirt.io/os: win2k12r2
+    kubevirt.io/os: win2k16
     miq.github.io/kubevirt-is-vm-template: "true"
 objects:
 - apiVersion: kubevirt.io/v1alpha1
@@ -16,6 +16,7 @@ objects:
     labels:
       kubevirt-ovm: ovm-${NAME}
   spec:
+    running: true
     selector:
       matchLabels:
         kubevirt-ovm: ovm-${NAME}
@@ -49,11 +50,13 @@ objects:
             type: q35
           resources:
             requests:
-              memory: ${MEMORY}
+              memory: ${{MEMORY}}
           devices:
             disks:
               - name: disk0
                 volumeName: disk0-pvc
+        nodeSelector:
+          region: master
         volumes:
           - name: disk0-pvc
             persistentVolumeClaim:
@@ -69,3 +72,4 @@ parameters:
   value: "4"
 - name: PVC_NAME
   description: Amount of cores
+  value: "windows-pvc-vm1"
