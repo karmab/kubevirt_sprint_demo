@@ -22,7 +22,6 @@ openshift_storage_glusterfs_namespace=app-storage
 openshift_storage_glusterfs_storageclass=true
 openshift_storageclass_default=true
 openshift_storage_glusterfs_block_deploy=false
-[% if metrics %]
 openshift_metrics_install_metrics=true
 openshift_metrics_storage_kind=nfs
 openshift_metrics_storage_access_modes=['ReadWriteOnce']
@@ -30,7 +29,6 @@ openshift_metrics_storage_nfs_directory=/opt/metrics-vol
 openshift_metrics_storage_nfs_options='*(rw,root_squash)'
 openshift_metrics_storage_volume_name=metrics
 openshift_metrics_storage_volume_size=10Gi
-[% endif %]
 
 # Uncomment the following to enable htpasswd authentication; defaults to
 # DenyAllPasswordIdentityProvider.
@@ -66,38 +64,37 @@ openshift_node_kubelet_args={'pods-per-core': ['10'], 'max-pods': ['250'], 'imag
 
 # enable ntp on masters to ensure proper failover
 openshift_clock_enabled=true
-[% if not metrics %]
-openshift_hosted_metrics_deploy=false
-[% endif %]
 openshift_master_default_subdomain=apps.[[ domain ]]
+openshift_hosted_infra_selector="region=master"
 
 [nfs]
 master01.[[ domain ]]
 
 # host group for masters
 [masters]
-master01.[[ domain ]]
+[% for master in range(0, masters) %]
+master0[[ master +1 ]].[[ domain ]]
+[% endfor %]
 
 
 # host group for etcd
 [etcd]
-master01.[[ domain ]]
+[% for master in range(0, masters) %]
+master0[[ master +1 ]].[[ domain ]]
+[% endfor %]
 
 [lb]
 
 [glusterfs]
-master01.[[ domain ]] glusterfs_devices='[ "/dev/vdc" ]'
-[% for node in range(0, nodes) %]
-node0[[ node +1 ]].[[ domain ]] glusterfs_devices='[ "/dev/vdc" ]'
+[% for master in range(0, masters) %]
+master0[[ master +1 ]].[[ domain ]] glusterfs_devices='[ "/dev/vdc" ]'
 [% endfor %]
 
 # host group for nodes, includes region info
 [nodes]
-master01.[[ domain ]] openshift_node_labels="{'region': 'master', 'zone': 'default'}"
+[% for master in range(0, masters) %]
+master0[[ master +1 ]].[[ domain ]] openshift_node_labels="{'region': 'master', 'zone': 'east'}"
+[% endfor %]
 [% for node in range(0, nodes) %]
-[% if node == 0 %]
-node0[[ node +1 ]].[[ domain ]] openshift_node_labels="{'region': 'infra', 'zone': 'default'}"
-[% else %]
 node0[[ node +1 ]].[[ domain ]] openshift_node_labels="{'region': 'primary', 'zone': 'east'}"
-[% endif %]
 [% endfor %]

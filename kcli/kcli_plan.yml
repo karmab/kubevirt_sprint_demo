@@ -2,9 +2,10 @@ parameters:
  template: CentOS-7-x86_64-GenericCloud.qcow2
  domain: karmalabs.local
  docker_disk_size: 30
- cns_disk_size: 50
+ cns_disk_size: 100
  master_memory: 8192
- node_memory: 4096
+ node_memory: 8192
+ masters: 3
  nodes: 2
  cidr: 192.168.105.0/24
  user: developer
@@ -12,14 +13,14 @@ parameters:
  openshift_version: openshift-ansible-3.9.0-0.42.0
  openshift_image_tag: v3.9.0-alpha.4
  deploy: false
- metrics: true
 
 [[ domain ]]:
  type: network
  cidr: [[ cidr ]]
  dhcp: True
 
-master01:
+[% for master in range(0, masters) %]
+master0[[ master + 1 ]]:
  template: [[ template ]]
  numcpus: 2
  memory: [[ master_memory ]]
@@ -41,9 +42,9 @@ master01:
     origin: install.sh
     mode: 700
  scripts: 
-  - pre.sh
   - heketi.sh
-  - install.sh
+  - pre.sh
+[% endfor %]
 
 [% for node in range(0, nodes) %]
 node0[[ node + 1 ]]:

@@ -2,25 +2,16 @@ This repo holds details for the demo of the current sprint work in kubevirt
 
 ## scope of the demo
 
-- deploy openshift3.9 on 3 nodes with metrics and cns
-- deploy kubevirt using an unified apb (pulling from kubevirt-ansible repo) and deploying an extra storage class
-- install a window template
-- launch a kubevirt windows vm instanciating the template
-- access a web service exposed on the vm
+- deploy openshift 3.9 on 3 masters + 3 nodes with metrics and cns, centos as base OS
+- ansible service broker backed up by NFS storage provided on the first master
+- deploy kubevirt
+- launch a vm with selinux enabled on the nodes
+- access windows vm using exposed rdp
+- switch the sqlserver of the vm to an external one
 
 ## infra used
 
-- 3 Bare metal servers running rhel
-
-additionally a single centos server was used with kvm to deploy the same setup
-
-We will deploy the following on the 3 nodes:
-
-- openshift ( 1 master and 2 nodes)
-- gluster.-kubernetes
-- ansible service broker backed up by NFS storage provided on the master
-- metrics using the same scheme
-- kubevirt using an APB
+- one 64GB physical machine. All nodes are VM with 8Gb of RAM and an extra 100GB disk for the master
 
 ## requisites
 
@@ -29,7 +20,6 @@ We will deploy the following on the 3 nodes:
 - install python-passlib and java-1.8.0-openjdk-headless on node running ansible ( for metrics install to work)
 
 ## deployment
-
 
 ### openshift
 
@@ -64,12 +54,6 @@ this is needed for the pod hawkular-cassandra and the metrics-cassandra-1 pvc
 
 ## Testing
 
-- import cirros image with a dedicated [disk-importer pod](import-windows.yml)
-
-```
-oc create -f import-cirros.yml
-```
-
 - import windows image with a [disk-importer pod](import-windows.yml)
 
 ```
@@ -90,17 +74,10 @@ oc create -f windows-template.yml -n openshift
 
 - deploy a windows vm using template from the openshift UI ( and specifying an existing PVC_NAME), which also indicates that the underlying vm should be started
 
-- check offlinevirtualmachine is there 
-
-```
-oc get ovm -n default
-```
-
 - access windows vm rdp
  
- for this, we used an ssh tunnel on the master to reach port 3389 on the private ip of the vm
+for this, we used an ssh tunnel on the master to reach port 3389 on the private ip of the vm
  
-
 - expose web service of the vm 
 
 ```
@@ -109,26 +86,12 @@ oc expose `oc get pod -l kubevirt.io/domain=$NAME -o name` --port=80 --name=$NAM
 oc expose svc --hostname=wingtiptoys.10.19.139.31.xip.io $NAME-web
 ```
 
+- switch sql server
+
+ TODO
+
+
 ## Additional information
-
-- Serve windows image from a given node
-
-```
-yum -y install httpd
-cd /var/www/html
-cp /var/lib/libvirt/images/win-test.qcow2 win-test.qcow2
-chown apache.apache *
-systemct enable httpd
-systemctl start httpd
-firewall-cmd --zone=public --add-port=80/tcp --permanent
-firewall-cmd --reload
-```
-
-- Delete completed pods
-
-```
-oc get pods --field-selector=status.phase!=Running -o name | xargs oc delete
-```
 
 - expose svc with a loadbalancer
 
@@ -137,9 +100,6 @@ oc expose pod virt-launcher-vm1-ephemeral-bbpbp --port=80 --name=mytest --type=L
 ```
 
 ## Lessons learnt
-
-- better to run the main playbook for openshift and then dedicated one for gluster and metrics
-- make sure you have all the relevant links for testing of all components
 
 ## Problems?
 

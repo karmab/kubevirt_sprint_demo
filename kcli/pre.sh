@@ -12,3 +12,4 @@ systemctl enable docker
 systemctl start docker
 yum -y update
 yum -y install centos-release-openshift-origin centos-release-gluster epel-release
+reboot
