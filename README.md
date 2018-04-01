@@ -23,7 +23,7 @@ This repo holds details for the demo of the current sprint work in kubevirt
 
 ### openshift
 
-- nodes were provisioned with centos cloud image
+- nodes were provisioned with rhel7.4 cloud image
 
 - to deploy openshift with cns, we run the playbook with this [inventory file](hosts)
 
@@ -32,19 +32,11 @@ ansible-playbook -i /root/hosts /root/openshift-ansible/playbooks/prerequisites.
 ansible-playbook -i /root/hosts /root/openshift-ansible/playbooks/deploy_cluster.yml
 ```
 
-- to launch metrics afterward
+for asb pods to launch, openshift-ansible-service-broker project needs to be patched
 
 ```
-ansible-playbook -i /root/hosts playbooks/openshift-metrics/config.yml
+oc patch namespace openshift-ansible-service-broker  -p '{"metadata":{"annotations":{"openshift.io/node-selector":""}}}'
 ```
-
-for metric pod to launch, patch the storageclass so that it is the default one
-
-```
-oc patch storageclass glusterfs-storage -p '{"metadata": {"annotations":{"storageclass.kubernetes.io/is-default-class":"true"}}}'
-```
-
-this is needed for the pod hawkular-cassandra and the metrics-cassandra-1 pvc
 
 ### post install 
 
