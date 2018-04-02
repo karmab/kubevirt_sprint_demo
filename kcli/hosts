@@ -5,30 +5,35 @@
 masters
 nodes
 etcd
-lb
 glusterfs
 
 # Set variables common for all OSEv3 hosts
 [OSEv3:vars]
-deployment_type=origin
-ansible_ssh_user=centos
+deployment_type=openshift-enterprise
+ansible_ssh_user=cloud-user
 ansible_become=True
 openshift_disable_check=disk_availability,docker_storage,memory_availability,package_availability,docker_image_availability
+dynamic_volumes_check=False
 enable_excluders=false
 containerized=true
-openshift_image_tag=[[ openshift_image_tag ]]
+openshift_release=v3.9
+openshift_image_tag=v3.9
 openshift_repos_enable_testing=True
+# cns
 openshift_storage_glusterfs_namespace=app-storage
 openshift_storage_glusterfs_storageclass=true
-openshift_storageclass_default=true
+openshift_storageclass_default=false
+openshift_storage_glusterfs_storageclass_default=True
 openshift_storage_glusterfs_block_deploy=false
+[% if metrics %]
+# metrics
 openshift_metrics_install_metrics=true
-openshift_metrics_storage_kind=nfs
-openshift_metrics_storage_access_modes=['ReadWriteOnce']
-openshift_metrics_storage_nfs_directory=/opt/metrics-vol
-openshift_metrics_storage_nfs_options='*(rw,root_squash)'
+openshift_metrics_cassanda_pvc_storage_class_name=glusterfs-storage
+#openshift_metrics_storage_access_modes=['ReadWriteOnce']
 openshift_metrics_storage_volume_name=metrics
 openshift_metrics_storage_volume_size=10Gi
+openshift_metrics_storage_kind=dynamic
+[% endif %]
 
 # Uncomment the following to enable htpasswd authentication; defaults to
 # DenyAllPasswordIdentityProvider.
@@ -46,15 +51,17 @@ openshift_master_cluster_public_hostname=master01.[[ domain ]]
 openshift_router_selector="region=master"
 openshift_registry_selector="region=master"
 os_sdn_network_plugin_name='redhat/openshift-ovs-multitenant'
-#openshift_hosted_router_replicas="1"
+[% if asb %]
+# asb
 ansible_service_broker_registry_whitelist=['.*-apb$']
-openshift_hosted_etcd_storage_kind=nfs
-openshift_hosted_etcd_storage_nfs_options="*(rw,root_squash,sync,no_wdelay)"
-openshift_hosted_etcd_storage_nfs_directory=/opt/etcd-vol
+openshift_hosted_etcd_storage_kind=dynamic
 openshift_hosted_etcd_storage_volume_name=etcd-vol
-openshift_hosted_etcd_storage_access_modes=["ReadWriteOnce"]
+#openshift_hosted_etcd_storage_access_modes=["ReadWriteOnce"]
 openshift_hosted_etcd_storage_volume_size=1G
 openshift_hosted_etcd_storage_labels={'storage': 'etcd'}
+openshift_hosted_registry_storage_kind=glusterfs
+openshift_hosted_registry_storage_volume_size=10Gi
+[% endif %]
 
 # apply updated node defaults
 openshift_node_kubelet_args={'pods-per-core': ['10'], 'max-pods': ['250'], 'image-gc-high-threshold': ['90'], 'image-gc-low-threshold': ['80']}
@@ -66,9 +73,6 @@ openshift_node_kubelet_args={'pods-per-core': ['10'], 'max-pods': ['250'], 'imag
 openshift_clock_enabled=true
 openshift_master_default_subdomain=apps.[[ domain ]]
 openshift_hosted_infra_selector="region=master"
-
-[nfs]
-master01.[[ domain ]]
 
 # host group for masters
 [masters]
@@ -83,18 +87,13 @@ master0[[ master +1 ]].[[ domain ]]
 master0[[ master +1 ]].[[ domain ]]
 [% endfor %]
 
-[lb]
-
 [glusterfs]
 [% for master in range(0, masters) %]
-master0[[ master +1 ]].[[ domain ]] glusterfs_devices='[ "/dev/vdc" ]'
+master0[[ master +1 ]].[[ domain ]] glusterfs_devices='[ "/dev/[[ cns_disk_device ]]" ]'
 [% endfor %]
 
 # host group for nodes, includes region info
 [nodes]
 [% for master in range(0, masters) %]
 master0[[ master +1 ]].[[ domain ]] openshift_node_labels="{'region': 'master', 'zone': 'east'}"
-[% endfor %]
-[% for node in range(0, nodes) %]
-node0[[ node +1 ]].[[ domain ]] openshift_node_labels="{'region': 'primary', 'zone': 'east'}"
 [% endfor %]

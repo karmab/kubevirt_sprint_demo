@@ -1,6 +1,7 @@
 parameters:
  template: rhel-server-7.4-x86_64-kvm.qcow2
  domain: rhsummits.local
+ docker_disk_device: vdb
  docker_disk_size: 30
  cns_disk_size: 20
  cns_disk_device: vdc
@@ -37,16 +38,16 @@ master0[[ master + 1 ]]:
  pool: default
  files:
   - path: /root/hosts
-    origin: hosts
+    origin: kcli/hosts
   - path: /root/install.sh
-    origin: install.sh
+    origin: kcli/install.sh
     mode: 700
   - path: /root/post.yml
-    origin: post.yml
+    origin: kcli/post.yml
     mode: 700
  scripts: 
-  - heketi.sh
+  - kcli/heketi.sh
   - ~/register.sh
-  - subscription.sh
-  - pre.sh
+  - kcli/subscription.sh
+  - kcli/pre.sh
 [% endfor %]
