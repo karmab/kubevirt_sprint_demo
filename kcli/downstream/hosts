@@ -5,7 +5,6 @@
 masters
 nodes
 etcd
-lb
 glusterfs
 
 # Set variables common for all OSEv3 hosts
@@ -20,17 +19,21 @@ containerized=true
 openshift_release=v3.9
 openshift_image_tag=v3.9
 openshift_repos_enable_testing=True
+# cns
 openshift_storage_glusterfs_namespace=app-storage
 openshift_storage_glusterfs_storageclass=true
 openshift_storageclass_default=false
 openshift_storage_glusterfs_storageclass_default=True
 openshift_storage_glusterfs_block_deploy=false
+[% if metrics %]
+# metrics
 openshift_metrics_install_metrics=true
 openshift_metrics_cassanda_pvc_storage_class_name=glusterfs-storage
 #openshift_metrics_storage_access_modes=['ReadWriteOnce']
 openshift_metrics_storage_volume_name=metrics
 openshift_metrics_storage_volume_size=10Gi
 openshift_metrics_storage_kind=dynamic
+[% endif %]
 
 # Uncomment the following to enable htpasswd authentication; defaults to
 # DenyAllPasswordIdentityProvider.
@@ -48,6 +51,8 @@ openshift_master_cluster_public_hostname=master01.[[ domain ]]
 openshift_router_selector="region=master"
 openshift_registry_selector="region=master"
 os_sdn_network_plugin_name='redhat/openshift-ovs-multitenant'
+[% if asb %]
+# asb
 ansible_service_broker_registry_whitelist=['.*-apb$']
 openshift_hosted_etcd_storage_kind=dynamic
 openshift_hosted_etcd_storage_volume_name=etcd-vol
@@ -56,6 +61,7 @@ openshift_hosted_etcd_storage_volume_size=1G
 openshift_hosted_etcd_storage_labels={'storage': 'etcd'}
 openshift_hosted_registry_storage_kind=glusterfs
 openshift_hosted_registry_storage_volume_size=10Gi
+[% endif %]
 
 # apply updated node defaults
 openshift_node_kubelet_args={'pods-per-core': ['10'], 'max-pods': ['250'], 'image-gc-high-threshold': ['90'], 'image-gc-low-threshold': ['80']}
@@ -67,9 +73,6 @@ openshift_node_kubelet_args={'pods-per-core': ['10'], 'max-pods': ['250'], 'imag
 openshift_clock_enabled=true
 openshift_master_default_subdomain=apps.[[ domain ]]
 openshift_hosted_infra_selector="region=master"
-
-#[nfs]
-#master01.[[ domain ]]
 
 # host group for masters
 [masters]
@@ -84,11 +87,9 @@ master0[[ master +1 ]].[[ domain ]]
 master0[[ master +1 ]].[[ domain ]]
 [% endfor %]
 
-[lb]
-
 [glusterfs]
 [% for master in range(0, masters) %]
-master0[[ master +1 ]].[[ domain ]] glusterfs_devices='[ "/dev/vdc" ]'
+master0[[ master +1 ]].[[ domain ]] glusterfs_devices='[ "/dev/[[ cns_disk_device ]]" ]'
 [% endfor %]
 
 # host group for nodes, includes region info

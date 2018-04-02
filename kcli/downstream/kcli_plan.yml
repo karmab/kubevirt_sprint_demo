@@ -2,16 +2,17 @@ parameters:
  template: rhel-server-7.4-x86_64-kvm.qcow2
  domain: rhsummits.local
  docker_disk_size: 30
- cns_disk_size: 100
+ cns_disk_size: 20
+ cns_disk_device: vdc
  master_memory: 8192
  node_memory: 8192
  masters: 3
  cidr: 192.168.96.0/24
  user: developer
  password: developer
- openshift_version: openshift-ansible-3.9.0-0.42.0
- openshift_image_tag: v3.9.0-alpha.4
  deploy: false
+ metrics: true
+ asb: true
 
 [[ domain ]]:
  type: network
