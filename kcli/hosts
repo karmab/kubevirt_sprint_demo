@@ -51,6 +51,10 @@ openshift_master_cluster_public_hostname=master01.[[ domain ]]
 openshift_router_selector="region=master"
 openshift_registry_selector="region=master"
 os_sdn_network_plugin_name='redhat/openshift-ovs-multitenant'
+
+# default node selector 
+osm_default_node_selector="region=master"
+
 [% if asb %]
 # asb
 ansible_service_broker_registry_whitelist=['.*-apb$']
