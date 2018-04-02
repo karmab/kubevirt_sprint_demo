@@ -80,7 +80,7 @@ oc expose svc --hostname=wingtiptoys.10.19.139.31.xip.io $NAME-web
 
 - switch sql server
 
- TODO
+TODO
 
 
 ## Additional information
@@ -89,6 +89,23 @@ oc expose svc --hostname=wingtiptoys.10.19.139.31.xip.io $NAME-web
 
 ```
 oc expose pod virt-launcher-vm1-ephemeral-bbpbp --port=80 --name=mytest --type=LoadBalancer
+```
+
+- fix broker-config configmap 
+
+```
+NAMESPACE="openshift-ansible-service-broker"
+oc get cm broker-config -n $NAMESPACE -o jsonpath='{.data.broker-config}' > broker-config.yml
+sed -i "s/rh/dh/" broker-config.yml
+sed -i "s/rhcc/dockerhub/" broker-config.yml
+sed -i "s/access.redhat.com/hub.docker.com/" broker-config.yml
+sed -i "s/org:/org: ansibleplaybookbundle/" broker-config.yml
+sed -i "s/tag:.*/tag: latest/" broker-config.yml
+sed -i "/auth_type/d"  broker-config.yml
+sed -i "/auth_name/d"  broker-config.yml
+oc delete cm broker-config -n $NAMESPACE
+oc create cm broker-config --from-file=broker-config=broker-config.yml -n $NAMESPACE
+oc delete pod --all -n $NAMESPACE
 ```
 
 ## Lessons learnt
