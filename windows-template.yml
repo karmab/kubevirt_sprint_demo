@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: Template
 metadata:
-  name: kubevirt-windows2016-vm-template
+  name: kubevirt-windows
   annotations:
     description: "OCP KubeVirt Microsoft Windows Server 2016 VM template"
     tags: "kubevirt,ocp,template,windows"
@@ -56,12 +56,44 @@ objects:
             disks:
               - name: disk0
                 volumeName: disk0-pvc
-        nodeSelector:
-          region: master
         volumes:
           - name: disk0-pvc
             persistentVolumeClaim:
               claimName: ${PVC_NAME}
+- apiVersion: v1
+  kind: Service
+  metadata:
+    name: rdp-${NAME}
+  spec:
+    ports:
+    - name: rdp
+      port: 3389
+    loadBalancerIP:
+    type: LoadBalancer
+    selector:
+      kubevirt.io/domain: ${NAME}
+- apiVersion: v1
+  kind: Service
+  metadata:
+    name: http-${NAME}
+  spec:
+    ports:
+    - name: http
+      port: 80
+    selector:
+      kubevirt.io/domain: ${NAME}
+- apiVersion: route.openshift.io/v1
+  kind: Route
+  metadata:
+    name: http-${NAME}
+  spec:
+    port:
+      targetPort: http
+    to:
+      kind: Service
+      name: http-{$NAME}
+      weight: 100
+    wildcardPolicy: None
 parameters:
 - name: NAME
   description: Name for the new VM
@@ -73,4 +105,4 @@ parameters:
   value: "4"
 - name: PVC_NAME
   description: Amount of cores
-  value: "windows-pvc-vm1"
+  value: "windows2"
