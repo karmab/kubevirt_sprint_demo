@@ -10,6 +10,15 @@ This repo holds details for the demo of the current sprint work in kubevirt
 - switch the sqlserver of the vm to an external one
 - show vm entities in the console
 
+## current issues
+
+- gluster custom provisioner doesnt work (so smart clone neither)
+- building of the custom webconsole image fails in the openshift-webconsole-server step
+- seeding script to additional sqlserver is missing
+- need to find out proper sqlserver connection string for remote access
+- vms lack default route
+- load balancer ips can't be reached through openvpn
+
 ## infra used
 
 - 3  BM physical machines with two additional SSD disks ( for docker and glusterfs)
@@ -67,8 +76,6 @@ TODO
 
 ### seed sqlserver linux database 
 TODO
-
-
 
 ## Testing
 
