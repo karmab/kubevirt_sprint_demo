@@ -5,6 +5,7 @@ metadata:
   annotations:
     description: "OCP KubeVirt Microsoft Windows Server 2016 VM template"
     tags: "kubevirt,ocp,template,windows"
+    iconClass: icon-shadowman
   labels:
     kubevirt.io/os: win2k16
     miq.github.io/kubevirt-is-vm-template: "true"
