@@ -2,47 +2,38 @@ This repo holds details for the demo of the current sprint work in kubevirt
 
 ## scope of the demo
 
-- deploy openshift 3.9 on 3 masters + 3 nodes with metrics and cns, centos as base OS
-- ansible service broker backed up by NFS storage provided on the first master
-- deploy kubevirt
-- launch a vm with selinux enabled on the nodes
-- access windows vm using exposed rdp
+- deploy downstream openshift 3.9 on 3 masters + 3 nodes with metrics and cns
+- deploy latest kubevirt
+- import windows vm with v2v apb
+- launch a windows vm using windows vm apb and using a cloned pvc
+- access windows vm using exposed rdp fron the outside
 - switch the sqlserver of the vm to an external one
+- show vm entities in the console
 
 ## infra used
 
-- one 64GB physical machine. All nodes are VM with 8Gb of RAM and an extra 100GB disk for the master
+- 3  BM physical machines with two additional SSD disks ( for docker and glusterfs)
 
 ## requisites
 
-- extras channels if using rhel
-- make sure to use a kernel recent enough (3.10.0-693.21.1.el7.x86_64) as it needs to be able to modprobe *target_core_user* module
-- install python-passlib and java-1.8.0-openjdk-headless on node running ansible ( for metrics install to work)
+- kernel recent enough (3.10.0-693.21.1.el7.x86_64) as it needs to be able to modprobe *target_core_user* module
 
 ## deployment
 
-### openshift
+### basic openshift installation
 
-- nodes were provisioned with rhel7.4 cloud image
+- nodes provisioned with rhel7.4
 
-- to deploy openshift with cns, we run the playbook with this [inventory file](hosts)
+- nodes prepared with [this script](installation/runcmd_master)
 
-```
-ansible-playbook -i /root/hosts /root/openshift-ansible/playbooks/prerequisites.yml
-ansible-playbook -i /root/hosts /root/openshift-ansible/playbooks/deploy_cluster.yml
-```
-
-for asb pods to launch, openshift-ansible-service-broker project needs to be patched
-
-```
-oc patch namespace openshift-ansible-service-broker  -p '{"metadata":{"annotations":{"openshift.io/node-selector":""}}}'
-```
+- we launch [this script](installation/install.sh) on the first master
+  among other things, it deploys openshift with this [inventory file](installation/hosts)
 
 ### post install 
 
 - to deploy kubevirt, we use provided kubevirt APB and select storage-cns flavor
 
-- we also disable selinux on all the nodes in order to be able to launch vms and install virtctl. For this task, the playbook [post.yml](post.yml) can be used, against the same inventory
+- we used the following playbook [post.yml](post.yml) to disable selinux and install virtctl on all the nodes, using the same inventory
 
 ## Testing
 
@@ -85,13 +76,8 @@ TODO
 
 ## Additional information
 
-- expose svc with a loadbalancer
 
-```
-oc expose pod virt-launcher-vm1-ephemeral-bbpbp --port=80 --name=mytest --type=LoadBalancer
-```
-
-- fix broker-config configmap 
+- fix broker-config configmap so we get apbs from docker hub
 
 ```
 NAMESPACE="openshift-ansible-service-broker"
@@ -99,7 +85,24 @@ oc create cm broker-config --from-file=broker-config=broker-config.yml -n $NAMES
 oc delete pod --all -n $NAMESPACE
 ```
 
+- download a big image from a google drive  ( using gdrive command line)
+
+```
+# get image at https://github.com/prasmussen/gdrive#downloads
+sudo cp gdrive-linux-x64 /usr/local/bin/gdrive;
+sudo chmod a+x /usr/local/bin/gdrive;
+gdrive download 0B7_OwkDsUIgFWXA1B2FPQfV5S8H
+```
+
+- expose svc with a loadbalancer
+
+```
+oc expose pod virt-launcher-vm1-ephemeral-bbpbp --port=80 --name=mytest --type=LoadBalancer
+```
+
 ## Lessons learnt
+
+- needs links for everything that needs testing!
 
 ## Problems?
 

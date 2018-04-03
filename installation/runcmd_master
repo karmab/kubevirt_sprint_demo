@@ -1,0 +1,16 @@
+yum -y remove katello-host-tools katello-agent katello-ca-consumer-se-sat6.cloud.lab.eng.bos.redhat.com
+mv /etc/rhsm/rhsm.conf.kat-backup /etc/rhsm/rhsm.conf
+subscription-manager register --force --activationkey=XXXX --org=YYYY
+subscription-manager repos --enable=rhel-7-server-rpms
+subscription-manager repos --enable=rhel-7-server-extras-rpms --enable=rhel-7-server-ose-3.9-rpms --enable=rhel-7-fast-datapath-rpms --enable=rhel-7-server-ansible-2.4-rpms
+yum clean all
+yum -y install wget git net-tools bind-utils iptables-services bridge-utils bash-completion atomic-openshift-utils atomic-openshift-excluder atomic-openshift-docker-excluder docker python-ipaddress
+wipefs -a /dev/sdn --force
+wipefs -a /dev/sdo --force
+wipefs -a /dev/sdp --force
+echo -e "DEVS=/dev/sdn\nVG=dockervg" > /etc/sysconfig/docker-storage-setup
+rm -rf /etc/sysconfig/docker-storage
+docker-storage-setup
+systemctl enable docker
+systemctl start docker
+yum -y update
