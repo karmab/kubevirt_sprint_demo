@@ -1,0 +1,13 @@
+apiVersion: servicecatalog.k8s.io/v1beta1
+kind: ServiceInstance
+metadata:
+  name: kubevirt
+  namespace: kube-system
+spec:
+  clusterServiceClassExternalName: dh-kubevirt-apb
+  clusterServicePlanExternalName: cns
+  parameters:
+    admin_user: developer
+    admin_password: developer
+    storage_role: storage-cns
+    tag: v0.4.0-alpha.2

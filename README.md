@@ -35,6 +35,41 @@ This repo holds details for the demo of the current sprint work in kubevirt
 
 - we used the following playbook [post.yml](post.yml) to disable selinux and install virtctl on all the nodes, using the same inventory
 
+
+### deploy clone enabled gluster provisioner
+
+- we need to substitute *rhgs3/rhgs-volmanager-rhel7:latest* for *gluster/heketiclone*
+
+```
+oc patch dc/heketi-storage  -n app-storage -p '{"spec":{"template":{"spec":{"$setElementOrder/containers":[{"name":"heketi"}],"containers":[{"image":"gluster/heketiclone:latest","name":"heketi"}]}}}}'
+```
+
+Note that this could also be done during initial deployment using this additional  inventory variable
+*openshift_storage_glusterfs_heketi_image: gluster/heketiclone*
+
+- deploy the external provisioner
+
+```
+oc project app-storage
+oc create -f  glusterfile-provisioner.yml
+```
+
+- add the proper provisioner and smartclone to the kubevirt storage class ( Note it needs to be recreated, as updating the provisioner is forbidden)
+
+```
+oc get sc kubevirt -o yaml | sed "s@provisioner:.*@  smartclone: \"true\"\nprovisioner: gluster.org/glusterfile@" > kubevirt-sc.yml
+oc delete -f kubevirt-sc.yml
+oc create -f kubevirt-sc.yml
+```
+
+### deploy custom webconsole with vm entities
+TODO
+
+### seed sqlserver linux database 
+TODO
+
+
+
 ## Testing
 
 - import windows image with a [disk-importer pod](import-windows.yml)
