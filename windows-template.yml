@@ -68,8 +68,9 @@ objects:
     ports:
     - name: rdp
       port: 3389
-    loadBalancerIP:
-    type: LoadBalancer
+#    loadBalancerIP:
+#    type: LoadBalancer
+    type: NodePort
     selector:
       kubevirt.io/domain: ${NAME}
 - apiVersion: v1

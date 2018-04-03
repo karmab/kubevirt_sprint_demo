@@ -72,45 +72,30 @@ TODO
 
 ## Testing
 
-- import windows image with a [disk-importer pod](import-windows.yml)
+- import windows image with the dedicated import-disk apb
 
 ```
-oc create -f import-windows.yml
-```
-
-alternatively we can install [disk import template](import-windows-template.yml)
-
-```
-oc create -f import-windows-template.yml -n openshift
+oc create -f import-disk-apb.yml
 ```
 
 - install [windows template](windows-template.yml)
 
 ```
-oc create -f windows-template.yml -n openshift
+oc create -f windows-template.yml -n default
 ```
 
-- deploy a windows vm using template from the openshift UI ( and specifying an existing PVC_NAME), which also indicates that the underlying vm should be started
+- deploy a windows vm using template from the openshift UI ( and specifying an existing PVC_NAME). this will:
+  - create the offline vm and start it
+  - create a service for rdp (using node port, as load balancer is failing because of vpn routing issues)
+  - create a service and a route for http
 
-- access windows vm rdp
+- access windows vm rdp locating on which node the vm is running and getting the nodeport used from the services tab
  
-for this, we used an ssh tunnel on the master to reach port 3389 on the private ip of the vm
- 
-- expose web service of the vm 
-
-```
-NAME="vm1"
-oc expose `oc get pod -l kubevirt.io/domain=$NAME -o name` --port=80 --name=$NAME-web
-oc expose svc --hostname=wingtiptoys.10.19.139.31.xip.io $NAME-web
-```
-
 - switch sql server
-
 TODO
 
 
 ## Additional information
-
 
 - fix broker-config configmap so we get apbs from docker hub
 
@@ -131,12 +116,6 @@ oc delete pod --all
 sudo cp gdrive-linux-x64 /usr/local/bin/gdrive;
 sudo chmod a+x /usr/local/bin/gdrive;
 gdrive download 0B7_OwkDsUIgFWXA1B2FPQfV5S8H
-```
-
-- expose svc with a loadbalancer
-
-```
-oc expose pod virt-launcher-vm1-ephemeral-bbpbp --port=80 --name=mytest --type=LoadBalancer
 ```
 
 ## Lessons learnt
