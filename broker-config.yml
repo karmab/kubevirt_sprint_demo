@@ -1,9 +1,9 @@
 registry:
-  - type: "dockerhub"
-    name: "dh"
-    url:  "https://registry.hub.docker.com"·
-    org: "ansibleplaybookbundle"
-    tag: "latest"
+  - type: dockerhub
+    name: dh
+    url:  https://registry.hub.docker.com
+    org: ansibleplaybookbundle
+    tag: latest
     white_list:
       - ".*-apb$"
   - type: local_openshift

@@ -31,7 +31,7 @@ This repo holds details for the demo of the current sprint work in kubevirt
 
 ### post install 
 
-- to deploy kubevirt, we use provided kubevirt APB and select storage-cns flavor
+- to deploy kubevirt, we use provided kubevirt APB and select storage-cns flavor. we use `oc create` with the following file [kubevirt-apb.yml](kubevirt-apb.yml)
 
 - we used the following playbook [post.yml](post.yml) to disable selinux and install virtctl on all the nodes, using the same inventory
 
@@ -81,8 +81,12 @@ TODO
 
 ```
 NAMESPACE="openshift-ansible-service-broker"
-oc create cm broker-config --from-file=broker-config=broker-config.yml -n $NAMESPACE
-oc delete pod --all -n $NAMESPACE
+oc project $NAMESPACE
+oc get cm broker-config -o yaml > broker-config-full.yml.old
+oc get cm broker-config -o jsonpath={'.data.broker-config'} > broker-config.yml.old
+oc delete cm broker-config
+oc create cm broker-config --from-file=broker-config=broker-config.yml
+oc delete pod --all
 ```
 
 - download a big image from a google drive  ( using gdrive command line)
