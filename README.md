@@ -47,9 +47,10 @@ This repo holds details for the demo of the current sprint work in kubevirt
 
 ### deploy clone enabled gluster provisioner
 
-- we need to substitute *rhgs3/rhgs-volmanager-rhel7:latest* for *gluster/heketiclone*
+- we need to substitute *rhgs3/rhgs-volmanager-rhel7:latest* for *gluster/heketiclone* in the heketi-storage dc
 
 ```
+oc patch dc/heketi-storage  -n app-storage -p '{"spec":{"template":{"spec":{"$setElementOrder/containers":[{"name":"heketi"}],"containers":[{"image":"gluster/heketiclone:latest","name":"heketi"}]}}}}'
 oc patch dc/heketi-storage  -n app-storage -p '{"spec":{"template":{"spec":{"$setElementOrder/containers":[{"name":"heketi"}],"containers":[{"image":"gluster/heketiclone:latest","name":"heketi"}]}}}}'
 ```
 
@@ -72,7 +73,15 @@ oc create -f kubevirt-sc.yml
 ```
 
 ### deploy custom webconsole with vm entities
-TODO
+
+- build a custom image with the required patches using procedure described in [console.sh](console.sh)
+- push the image in docker hub
+- update webconsole deployment to use the custom image
+
+```
+oc get deploy webconsole -n openshift-web-console  -o yaml > webconsole.yml.old
+oc patch deploy/webconsole  -n openshift-web-console -p '{"spec":{"template":{"spec":{"$setElementOrder/containers":[{"name":"webconsole"}],"containers":[{"image":"karmab/origin-web-console:latest","name":"webconsole"}]}}}}'
+```
 
 ### seed sqlserver linux database 
 TODO

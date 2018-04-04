@@ -77,7 +77,7 @@ spec:
       serviceAccountName: glusterfile-provisioner
       containers:
       - name: glusterfile-provisioner
-        image: gluster/glusterfile-provisioner:latest
+        image: gluster/glusterfileclone:latest
         imagePullPolicy: IfNotPresent
         env:
         - name: PROVISIONER_NAME
