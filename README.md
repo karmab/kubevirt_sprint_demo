@@ -12,11 +12,12 @@ This repo holds details for the demo of the current sprint work in kubevirt
 
 ## current issues
 
-- gluster custom provisioner doesnt work (so smart clone neither)
-- building of the custom webconsole image fails in the openshift-webconsole-server step
+- heketi admin secret type has to be changed to gluster.org/glusterfile, making default gluster storage class useless
+- custom build of the custom webconsole image  crashloops
+- same template fails to be deployed through template service broker. should leave in default project if old templating system will be used
 - seeding script to additional sqlserver is missing
 - need to find out proper sqlserver connection string for remote access
-- vms lack default route
+- fedora vms lack default route
 - load balancer ips can't be reached through openvpn
 
 ## infra used
@@ -57,7 +58,7 @@ oc patch dc/heketi-storage  -n app-storage -p '{"spec":{"template":{"spec":{"$se
 Note that this could also be done during initial deployment using this additional  inventory variable
 *openshift_storage_glusterfs_heketi_image: gluster/heketiclone*
 
-- deploy the external provisioner
+- deploy the external provisioner using [glusterfile-provisioner.yml](glusterfile-provisioner.yml)
 
 ```
 oc project app-storage
@@ -71,6 +72,19 @@ oc get sc kubevirt -o yaml | sed "s@provisioner:.*@  smartclone: \"true\"\nprovi
 oc delete -f kubevirt-sc.yml
 oc create -f kubevirt-sc.yml
 ```
+
+- switch kubevirt sc so it's the default one!!!
+- change the type of the secret type: heketi-storage-admin-secret to *gluster.org/glusterfile*
+
+```
+oc get secret heketi-storage-admin-secret -o yaml -n app-storage > secret.yaml.old
+oc get secret heketi-storage-admin-secret -o yaml -n app-storage > secret.yaml
+oc delete -f secret.yml
+oc create -f secret.yml
+```
+
+
+
 
 ### deploy custom webconsole with vm entities
 
