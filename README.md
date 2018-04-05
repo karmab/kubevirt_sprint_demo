@@ -12,6 +12,8 @@ This repo holds details for the demo of the current sprint work in kubevirt
 
 ## current issues
 
+
+- need to find the best HA name for master config... defaulting to first node is wrong
 - heketi admin secret type has to be changed to gluster.org/glusterfile, making default gluster storage class useless
 - custom build of the custom webconsole image  crashloops
 - same template fails to be deployed through template service broker. should leave in default project if old templating system will be used
