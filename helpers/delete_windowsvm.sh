@@ -1,4 +1,4 @@
-NAMESPACE=${2:-default}
+NAMESPACE=`oc project -q`
 oc delete ovm $1 -n $NAMESPACE
 oc delete route http-$1 -n $NAMESPACE
 oc delete svc http-$1 -n $NAMESPACE
