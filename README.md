@@ -93,7 +93,7 @@ oc create -f secret.yml
 
 ```
 oc get deploy webconsole -n openshift-web-console  -o yaml > webconsole.yml.old
-oc patch deploy/webconsole  -n openshift-web-console -p '{"spec":{"template":{"spec":{"$setElementOrder/containers":[{"name":"webconsole"}],"containers":[{"image":"openshift/origin-web-console:v3.10","name":"webconsole"}]}}}}'
+oc patch deploy/webconsole  -n openshift-web-console -p '{"spec":{"template":{"spec":{"$setElementOrder/containers":[{"name":"webconsole"}],"containers":[{"image":"jniederm/origin-web-console:demo-v2-ebd3660c-47b77c45","name":"webconsole"}]}}}}'
 ```
 
 ### seed sqlserver linux database 
@@ -142,9 +142,10 @@ oc delete pod --all
 
 ```
 # get image at https://github.com/prasmussen/gdrive#downloads
-sudo cp gdrive-linux-x64 /usr/local/bin/gdrive;
-sudo chmod a+x /usr/local/bin/gdrive;
+sudo cp gdrive-linux-x64 /usr/bin/gdrive
+sudo chmod a+x /usr/bin/gdrive
 gdrive download 1hG9otdB7Vs2J1nqwyUPpdVKP3QdvAqoC
+qemu-img convert -O raw SummitVM.vdi SummitVM.img
 ```
 
 - [gluster troubleshooting](gluster.md]

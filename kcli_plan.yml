@@ -3,10 +3,9 @@ parameters:
  domain: rhsummits.local
  docker_disk_device: vdb
  docker_disk_size: 30
- cns_disk_size: 20
+ cns_disk_size: 120
  cns_disk_device: vdc
- master_memory: 8192
- node_memory: 8192
+ master_memory: 10240
  masters: 3
  cidr: 192.168.96.0/24
  user: developer
