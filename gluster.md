@@ -13,7 +13,6 @@ reboot otherwise
 # list heketi volumes from heketi
 
 ```
-#oc get secret heketi-storage-admin-secret -n app-storage -o jsonpath='{.data.key} | base64 -D'
 oc rsh HEKETI_POD
 heketi-cli --user admin --secret $HEKETI_ADMIN_KEY volume list
 ```

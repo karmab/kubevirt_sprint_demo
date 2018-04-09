@@ -10,4 +10,4 @@ spec:
     admin_user: developer
     admin_password: developer
     pvc_name: windows2
-    url: http://10.19.139.34/windows/SummitVM.img
+    url: http://10.19.139.34:81/windows/SummitVM.img

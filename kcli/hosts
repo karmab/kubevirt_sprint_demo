@@ -6,6 +6,7 @@ masters
 nodes
 etcd
 glusterfs
+lb
 
 # Set variables common for all OSEv3 hosts
 [OSEv3:vars]
@@ -19,6 +20,9 @@ containerized=true
 openshift_release=v3.9
 openshift_image_tag=v3.9
 openshift_repos_enable_testing=True
+# web console
+openshift_web_console_prefix=openshift/origin-
+openshift_web_console_version=v3.10
 # cns
 openshift_storage_glusterfs_namespace=app-storage
 openshift_storage_glusterfs_storageclass=true
@@ -46,8 +50,8 @@ openshift_master_identity_providers=[{'name': 'htpasswd_auth', 'login': 'true', 
 # or to one or all of the masters defined in the inventory if no load
 # balancer is present.
 openshift_master_cluster_method=native
-openshift_master_cluster_hostname=master01.[[ domain ]]
-openshift_master_cluster_public_hostname=master01.[[ domain ]]
+openshift_master_cluster_hostname=master.[[ domain ]]
+openshift_master_cluster_public_hostname=master.[[ domain ]]
 openshift_router_selector="region=master"
 openshift_registry_selector="region=master"
 os_sdn_network_plugin_name='redhat/openshift-ovs-multitenant'
@@ -75,7 +79,7 @@ openshift_node_kubelet_args={'pods-per-core': ['10'], 'max-pods': ['250'], 'imag
 
 # enable ntp on masters to ensure proper failover
 openshift_clock_enabled=true
-openshift_master_default_subdomain=apps.[[ domain ]]
+openshift_master_default_subdomain=[[ domain ]]
 openshift_hosted_infra_selector="region=master"
 
 # host group for masters
@@ -84,6 +88,8 @@ openshift_hosted_infra_selector="region=master"
 master0[[ master +1 ]].[[ domain ]]
 [% endfor %]
 
+[lb]
+master.[[ domain ]]
 
 # host group for etcd
 [etcd]
