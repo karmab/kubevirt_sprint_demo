@@ -1,11 +1,20 @@
 apiVersion: v1
 kind: Template
+labels:
+  app: kubevirt-windows
+  template: kubevirt-windows-template
+message: KubeVirt Windoes Server 2016 virtual machines created in your project.
 metadata:
   name: kubevirt-windows
   annotations:
+    openshift.io/display-name: "Windows Server 2016 VM"
     description: "OCP KubeVirt Microsoft Windows Server 2016 VM template"
     tags: "kubevirt,ocp,template,windows"
     iconClass: icon-shadowman
+    template.openshift.io/long-description: >-
+      OCP KubeVirt Microsoft Windows Server 2016 VM template
+    template.openshift.io/provider-display-name: "Windows Server 2016 VM"
+    template.openshift.io/support-url: "https://access.redhat.com"
   labels:
     kubevirt.io/os: win2k16
     miq.github.io/kubevirt-is-vm-template: "true"
