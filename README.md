@@ -89,35 +89,44 @@ oc set image deploy/webconsole webconsole=$IMAGE  -n openshift-web-console
 
 - TODO: document how to build a custom image with the required patches available [here](https://happylynx.github.io/2018/04/06/custom-compilation-of-origin-web-console.html)
 
-## Import windows image as a pvc
+### Import windows image as a pvc
 
-- import windows image with the dedicated import-disk apb
+- we import windows image twice with the dedicated import-disk apb to the pvcs [windows](import-disk-apb.yml) and [windows2](import-disk-apb2.yml)
 
 ```
 oc create -f import-disk-apb.yml
+oc create -f import-disk-apb2.yml
 ```
 
-- install [windows template](windows-template.yml)
+### Install templates
+
+- [windows runonce template](windows-template-runonce.yml) using the windows pvc, and intended to be launched once and not destroyed
+- [windows template2](windows-template2.yml) using the windows2 pvc, and intended to be used for creation/deletion test
 
 ```
-oc create -f windows-template.yml -n openshift
+oc create -f windows-template-runonce.yml -n default
+oc create -f windows-template2.yml -n openshift
 ```
+
+## Workflow
+
 
 - deploy a windows vm using template from the openshift UI. this will:
   - create the offline vm (stopped) based on the existing windows pvc
   - create a service for rdp (using node port, as load balancer is failing because of vpn routing issues)
   - create a service and a route for http
-
 - access windows vm rdp locating on which node the vm is running and getting the nodeport used from the services tab
- 
-## TODO
+- TODO: seed sqlserver linux database 
+- TODO: switch sql server DB in the windows vm
 
-- seed sqlserver linux database 
-- switch sql server DB in the windows vm
+## Additional tricks
 
-## Additional information
+- handle cache issues in ansible service broker
 
-- download a big image from a google drive  ( using gdrive command line)
+  use the provided script [clean_service_catalog.sh](clean_service_catalog.sh)
+
+
+- downloading a big image from a google drive with command line
 
 ```
 # get image at https://github.com/prasmussen/gdrive#downloads
@@ -127,7 +136,7 @@ gdrive download 1hG9otdB7Vs2J1nqwyUPpdVKP3QdvAqoC
 qemu-img convert -O raw SummitVM.vdi SummitVM.img
 ```
 
-- we cover gluster cloning in a separate doc, [gluster troubleshooting](glustercloning/README.md]
+- we cover gluster cloning in a separate [doc](glustercloning/README.md)
 
 ## Lessons learnt
 

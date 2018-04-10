@@ -5,7 +5,7 @@ metadata:
   annotations:
     description: "Dummy template"
     tags: "ocp,template,dummy"
-    iconClass: icon-shadowman
+    iconClass: icon-jruby
   labels:
     miq.github.io/kubevirt-is-vm-template: "true"
 objects:

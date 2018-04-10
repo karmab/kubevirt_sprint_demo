@@ -1,7 +1,7 @@
 apiVersion: servicecatalog.k8s.io/v1beta1
 kind: ServiceInstance
 metadata:
-  name: importdisk
+  name: importdisk2
   namespace: default
 spec:
   clusterServiceClassExternalName: dh-import-vm-disk-apb
@@ -9,5 +9,5 @@ spec:
   parameters:
     admin_user: developer
     admin_password: developer
-    pvc_name: windows
+    pvc_name: windows2
     url: http://10.19.139.34:81/windows/SummitVM.img

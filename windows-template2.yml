@@ -1,0 +1,115 @@
+apiVersion: template.openshift.io/v1
+kind: Template
+labels:
+  app: kubevirt-windows
+  demo: windows2
+  template: kubevirt-windows-template
+message: Wingtip Toy Application windows VM has been created in your project
+metadata:
+  annotations:
+    description: Wingtip Toy Application VM
+    openshift.io/display-name: Wingtip Toy Application VM
+    openshift.io/documentation-url: https://docs.openshift.org/latest
+    openshift.io/long-description: Wingtip Toy Application VM
+    openshift.io/provider-display-name: Red Hat, Inc.
+    openshift.io/support-url: https://access.redhat.com
+    tags: virtualmachine
+  labels:
+    kubevirt.io/os: win2k16
+    miq.github.io/kubevirt-is-vm-template: "true"
+  name: kubevirt-windows
+  namespace: openshift
+objects:
+- apiVersion: kubevirt.io/v1alpha1
+  kind: OfflineVirtualMachine
+  metadata:
+    labels:
+      demo: windows2
+      kubevirt-ovm: ovm-${Name}
+    name: ${Name}
+  spec:
+    running: false
+    selector:
+      matchLabels:
+        kubevirt-ovm: ovm-${Name}
+    template:
+      metadata:
+        labels:
+          kubevirt-ovm: ovm-${Name}
+      spec:
+        domain:
+          clock:
+            timer:
+              hpet:
+                present: false
+              hyperv: {}
+              pit:
+                tickPolicy: delay
+              rtc:
+                tickPolicy: catchup
+            utc: {}
+          cpu:
+            cores: 4
+          devices:
+            disks:
+            - name: disk0
+              volumeName: disk0-pvc
+          features:
+            acpi: {}
+            apic: {}
+            hyperv:
+              relaxed: {}
+              spinlocks:
+                spinlocks: 8191
+              vapic: {}
+          machine:
+            type: q35
+          resources:
+            requests:
+              memory: ${{Memory}}
+        volumes:
+        - name: disk0-pvc
+          persistentVolumeClaim:
+            claimName: windows2
+- apiVersion: v1
+  kind: Service
+  metadata:
+    name: rdp-${Name}
+  spec:
+    ports:
+    - name: rdp
+      port: 3389
+    selector:
+      kubevirt.io/domain: ${Name}
+    type: NodePort
+- apiVersion: v1
+  kind: Service
+  metadata:
+    name: http-${Name}
+  spec:
+    ports:
+    - name: http
+      port: 80
+    selector:
+      kubevirt.io/domain: ${Name}
+- apiVersion: route.openshift.io/v1
+  kind: Route
+  metadata:
+    name: http-${Name}
+  spec:
+    port:
+      targetPort: http
+    to:
+      kind: Service
+      name: http-${Name}
+      weight: 100
+    wildcardPolicy: None
+parameters:
+- description: Name for the new VM
+  name: Name
+- description: Amount of memory
+  name: Memory
+  value: 8192Mi
+- description: Amount of cores
+  name: Cpu_cores
+  value: "4"
