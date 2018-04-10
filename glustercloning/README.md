@@ -1,5 +1,6 @@
 ### deploy clone enabled gluster provisioner
 
+heketi admin secret type has to be changed to gluster.org/glusterfile, making default gluster storage class useless
 - we need to substitute *rhgs3/rhgs-volmanager-rhel7:latest* for *gluster/heketiclone* in the heketi-storage dc
 
 ```

@@ -4,23 +4,22 @@ This repo holds details for the demo of the current sprint work in kubevirt
 
 - deploy downstream openshift 3.9 on 3 masters + 3 nodes with metrics and cns
 - deploy latest kubevirt
-- import windows vm with v2v apb
-- launch a windows vm using windows vm apb and using a cloned pvc
+- show v2v apb
+- import windows vm disk with v2v apb
+- show vm entities in the console, start vm from console
+- launch a windows vm using windows vm template
 - access windows vm using exposed rdp fron the outside
-- switch the sqlserver of the vm to an external one
-- show vm entities in the console
+- deploy an sqlserver apb
+- switch the sqlserver of windows to this external one
 
 ## current issues
 
-
 - need to find the best HA name for master config... defaulting to first node is wrong
-- heketi admin secret type has to be changed to gluster.org/glusterfile, making default gluster storage class useless
-- custom build of the custom webconsole image  crashloops
 - same template fails to be deployed through template service broker. should leave in default project if old templating system will be used
 - seeding script to additional sqlserver is missing
 - need to find out proper sqlserver connection string for remote access
-- fedora vms lack default route
 - load balancer ips can't be reached through openvpn
+- cloning disabled
 
 ## infra used
 
@@ -49,10 +48,15 @@ This repo holds details for the demo of the current sprint work in kubevirt
 yum -y install openshift-ansible screen
 ansible-playbook -i /root/hosts /usr/share/ansible/openshift-ansible/playbooks/prerequisites.yml
 ansible-playbook -i /root/hosts /usr/share/ansible/openshift-ansible/playbooks/deploy_cluster.yml
-ansible-playbook -i /root/hosts /root/post.yml
 ```
 
 ### post install 
+
+we disable selinux and install virtctl on all the nodes with this template
+
+```
+ansible-playbook -i /root/hosts /root/post.yml
+```
 
 - we fix broker-config configmap so we get apbs from docker hub
 
@@ -66,7 +70,9 @@ oc create cm broker-config --from-file=broker-config=broker-config.yml
 oc delete pod --all
 ```
 
-- to deploy kubevirt, we use provided kubevirt APB with storage-cns flavor. the following file [kubevirt-apb.yml](kubevirt-apb.yml) is used
+### kubevirt
+
+we use the existing kubevirt APB with storage-cns flavor. the following file [kubevirt-apb.yml](kubevirt-apb.yml) is used
 
 ```
 oc create -f kubevirt-apb.yml
@@ -125,7 +131,6 @@ qemu-img convert -O raw SummitVM.vdi SummitVM.img
 
 ## Lessons learnt
 
-- clone is not enabled(but info kept in [cloning](cloning.md)
 - needs links for everything that needs testing!
 
 ## Problems?

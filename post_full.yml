@@ -3,8 +3,6 @@
   remote_user: root
   vars:
     version: v0.4.1-alpha.1
-    admin_user: developer
-    admin_password: developer
   tasks:
   - name: Ensure selinux is disabled
     selinux:
@@ -21,5 +19,19 @@
     with_items:
       - xorg-x11-xauth
       - virt-viewer
-  - name: enable default user
-    cmd: htpasswd -b /etc/origin/master/htpasswd {{ admin_user }} {{ admin_password }}
+
+- hosts: master01
+  remote_user: centos
+  become: true
+  vars:
+    user: developer
+    password: developer
+    version: v0.4.1-alpha.1
+    plan: cns
+  tasks:
+  - name: Render kubevirt service instance
+    template:
+     src: si.yml.j2
+     dest: /tmp/si.yml
+  - name: install kubevirt service instance
+    command: /usr/local/bin/oc create -f /tmp/si.yml
