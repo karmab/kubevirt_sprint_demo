@@ -25,6 +25,7 @@ This repo holds details for the demo of the current sprint work in kubevirt
 ## infra used
 
 - 3  BM physical machines with two additional SSD disks ( for docker and glusterfs)
+- openshift-ansible-roles-3.9.14-1.git.3.c62bc34.el7.noarch
 
 ## requisites
 
