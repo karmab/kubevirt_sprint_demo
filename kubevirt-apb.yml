@@ -5,9 +5,9 @@ metadata:
   namespace: kube-system
 spec:
   clusterServiceClassExternalName: dh-kubevirt-apb
-  clusterServicePlanExternalName: cns
+  clusterServicePlanExternalName: gluster
   parameters:
     admin_user: developer
     admin_password: developer
-    storage_role: storage-cns
-    tag: v0.4.0-alpha.2
+    storage_role: storage-glusterfs
+    tag: v0.4.1-alpha.1
