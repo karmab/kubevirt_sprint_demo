@@ -92,7 +92,7 @@ objects:
       targetPort: http
     to:
       kind: Service
-      name: http-{$NAME}
+      name: http-${NAME}
       weight: 100
     wildcardPolicy: None
 parameters:

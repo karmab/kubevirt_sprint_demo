@@ -87,14 +87,14 @@ oc create -f secret.yml
 
 ### deploy custom webconsole with vm entities
 
-- build a custom image with the required patches using procedure described in [console.sh](console.sh)
-- push the image in docker hub
 - update webconsole deployment to use the custom image
 
 ```
 oc get deploy webconsole -n openshift-web-console  -o yaml > webconsole.yml.old
 oc patch deploy/webconsole  -n openshift-web-console -p '{"spec":{"template":{"spec":{"$setElementOrder/containers":[{"name":"webconsole"}],"containers":[{"image":"jniederm/origin-web-console:demo-v2-ebd3660c-47b77c45","name":"webconsole"}]}}}}'
 ```
+
+- to build a custom image with the required patches, we can use (TODO)
 
 ### seed sqlserver linux database 
 TODO
