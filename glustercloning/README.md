@@ -3,8 +3,7 @@
 - we need to substitute *rhgs3/rhgs-volmanager-rhel7:latest* for *gluster/heketiclone* in the heketi-storage dc
 
 ```
-oc patch dc/heketi-storage  -n app-storage -p '{"spec":{"template":{"spec":{"$setElementOrder/containers":[{"name":"heketi"}],"containers":[{"image":"gluster/heketiclone:latest","name":"heketi"}]}}}}'
-oc patch dc/heketi-storage  -n app-storage -p '{"spec":{"template":{"spec":{"$setElementOrder/containers":[{"name":"heketi"}],"containers":[{"image":"gluster/heketiclone:latest","name":"heketi"}]}}}}'
+oc set image deploy/webconsole heketi=gluster/heketiclone:latest  -n app-storage
 ```
 
 Note that this could also be done during initial deployment using this additional  inventory variable

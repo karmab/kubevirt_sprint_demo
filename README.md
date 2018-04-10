@@ -77,8 +77,8 @@ oc create -f kubevirt-apb.yml
 - update webconsole deployment to use the custom image
 
 ```
-oc get deploy webconsole -n openshift-web-console  -o yaml > webconsole.yml.old
-oc patch deploy/webconsole  -n openshift-web-console -p '{"spec":{"template":{"spec":{"$setElementOrder/containers":[{"name":"webconsole"}],"containers":[{"image":"jniederm/origin-web-console:demo-v2-ebd3660c-47b77c45","name":"webconsole"}]}}}}'
+IMAGE="jniederm/origin-web-console:demo-v2-ebd3660c-47b77c45"
+oc set image deploy/webconsole webconsole=$IMAGE  -n openshift-web-console
 ```
 
 - TODO: document how to build a custom image with the required patches available [here](https://happylynx.github.io/2018/04/06/custom-compilation-of-origin-web-console.html)
