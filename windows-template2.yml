@@ -26,6 +26,8 @@ objects:
     labels:
       demo: windows2
       kubevirt-ovm: ovm-${Name}
+      kubevirt.io/os: win2k16
+      kubevirt.io/domain: windows
     name: ${Name}
   spec:
     running: false
