@@ -27,7 +27,7 @@ objects:
       demo: windows2
       kubevirt-ovm: ovm-${Name}
       kubevirt.io/os: win2k16
-      kubevirt.io/domain: windows
+      kubevirt.io/domain: ${Name}
     name: ${Name}
   spec:
     running: false
@@ -76,6 +76,8 @@ objects:
 - apiVersion: v1
   kind: Service
   metadata:
+    labels:
+      kubevirt.io/domain: ${Name}
     name: rdp-${Name}
   spec:
     ports:
