@@ -4,13 +4,13 @@ labels:
   app: kubevirt-windows-runonce
   demo: windows
   template: kubevirt-windows-template
-message: Wingtip Toy Application windows VM has been created in your project
+message: Wingtip Toys Application windows VM has been created in your project
 metadata:
   annotations:
-    description: Wingtip Toy Application VM
-    openshift.io/display-name: Wingtip Toy Application VM
+    description: Wingtip Toys Application VM
+    openshift.io/display-name: Wingtip Toys Application VM
     openshift.io/documentation-url: https://docs.openshift.org/latest
-    openshift.io/long-description: Wingtip Toy Application VM
+    openshift.io/long-description: Wingtip Toys Application VM
     openshift.io/provider-display-name: Red Hat, Inc.
     openshift.io/support-url: https://access.redhat.com
   labels:
