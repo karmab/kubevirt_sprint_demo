@@ -26,6 +26,7 @@ objects:
       demo: windows
       kubevirt-ovm: ovm-${Name}
       kubevirt.io/domain: ${Name}
+      kubevirt.io/os: win2k16
     name: ${Name}
   spec:
     running: true
