@@ -1,12 +1,8 @@
-# Create an OSEv3 group that contains the master, nodes, etcd, and lb groups.
-# The lb group lets Ansible configure HAProxy as the load balancing solution.
-# Comment lb out if your load balancer is pre-configured.
 [OSEv3:children]
 masters
 nodes
 etcd
 glusterfs
-lb
 
 # Set variables common for all OSEv3 hosts
 [OSEv3:vars]
@@ -21,8 +17,8 @@ openshift_release=v3.9
 openshift_image_tag=v3.9
 openshift_repos_enable_testing=True
 # web console
-openshift_web_console_prefix=openshift/origin-
-openshift_web_console_version=v3.10
+openshift_web_console_prefix=jniederm/origin-
+openshift_web_console_version=demo-v7
 # cns
 openshift_storage_glusterfs_namespace=app-storage
 openshift_storage_glusterfs_storageclass=true
@@ -51,8 +47,8 @@ openshift_master_htpasswd_users={'developer': '$apr1$3OQDYj9G$zrxRzJKiy7XqARTrTA
 # or to one or all of the masters defined in the inventory if no load
 # balancer is present.
 openshift_master_cluster_method=native
-openshift_master_cluster_hostname=master.[[ domain ]]
-openshift_master_cluster_public_hostname=master.[[ domain ]]
+openshift_master_cluster_hostname=master01.[[ domain ]]
+openshift_master_cluster_public_hostname=master01.[[ domain ]]
 openshift_router_selector="region=master"
 openshift_registry_selector="region=master"
 os_sdn_network_plugin_name='redhat/openshift-ovs-multitenant'
@@ -89,9 +85,6 @@ openshift_hosted_infra_selector="region=master"
 [% for master in range(0, masters) %]
 master0[[ master +1 ]].[[ domain ]]
 [% endfor %]
-
-[lb]
-master.[[ domain ]]
 
 # host group for etcd
 [etcd]

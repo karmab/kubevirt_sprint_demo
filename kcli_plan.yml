@@ -45,9 +45,6 @@ master0[[ master + 1 ]]:
   - path: /root/post.yml
     origin: kcli/post.yml
     mode: 700
-  - path: /root/broker-config.yml
-    origin: kcli/broker-config.yml
-    mode: 700
  scripts: 
   - kcli/heketi.sh
   - ~/register.sh
