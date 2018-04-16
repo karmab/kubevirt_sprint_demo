@@ -71,7 +71,7 @@ oc create -f kubevirt-apb.yml
 - update webconsole deployment to use the custom image
 
 ```
-IMAGE="jniederm/origin-web-console:demo-v4"
+IMAGE="jniederm/origin-web-console:demo-v7"
 oc set image deploy/webconsole webconsole=$IMAGE  -n openshift-web-console
 ```
 
