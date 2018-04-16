@@ -92,7 +92,7 @@ we use the [windows runonce template](windows-template-runonce.yml) using the wi
 
 ```
 NAMESPACE="summit-demo"
-oc process -f windows-template-runonce.yml -p Name=windows | oc create -n $NAMESPACE -f -
+oc process -f windows-template-runonce.yml -p Name=windows | oc create -f - -n $NAMESPACE
 ```
 
 ### Install template
@@ -105,21 +105,15 @@ oc create -f windows-template2.yml -n openshift
 
 ## Workflow
 
-
 - deploy a windows vm using template from the openshift UI. this will:
   - create the offline vm (stopped) based on the existing windows pvc
   - create a service for rdp (using node port, as load balancer is failing because of vpn routing issues)
   - create a service and a route for http
-- access windows vm rdp locating on which node the vm is running and getting the nodeport used from the services tab
+- access windows vm rdp using the provided link
 - TODO: seed sqlserver linux database 
 - TODO: switch sql server DB in the windows vm
 
 ## Additional tricks
-
-- handle cache issues in ansible service broker
-
-  use the provided script [clean_service_catalog.sh](clean_service_catalog.sh)
-
 
 - downloading a big image from a google drive with command line
 
@@ -130,8 +124,6 @@ sudo chmod a+x /usr/bin/gdrive
 gdrive download 1hG9otdB7Vs2J1nqwyUPpdVKP3QdvAqoC
 qemu-img convert -O raw SummitVM.vdi SummitVM.img
 ```
-
-- we cover gluster cloning in a separate [doc](glustercloning/README.md)
 
 ## Lessons learnt
 
