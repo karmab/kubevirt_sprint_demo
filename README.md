@@ -58,18 +58,6 @@ we disable selinux and install virtctl on all the nodes with this template
 ansible-playbook -i /root/hosts /root/post.yml
 ```
 
-- we fix broker-config configmap so we get apbs from docker hub
-
-```
-NAMESPACE="openshift-ansible-service-broker"
-oc project $NAMESPACE
-oc get cm broker-config -o yaml > broker-config-full.yml.old
-oc get cm broker-config -o jsonpath={'.data.broker-config'} > broker-config.yml.old
-oc delete cm broker-config
-oc create cm broker-config --from-file=broker-config=broker-config.yml
-oc delete pod --all
-```
-
 ### kubevirt
 
 we use the existing kubevirt APB with storage-cns flavor. the following file [kubevirt-apb.yml](kubevirt-apb.yml) is used
@@ -98,13 +86,20 @@ oc create -f import-disk-apb.yml
 oc create -f import-disk-apb2.yml
 ```
 
-### Install templates
+### Deploy a sample VM
 
-- [windows runonce template](windows-template-runonce.yml) using the windows pvc, and intended to be launched once and not destroyed
+we use the [windows runonce template](windows-template-runonce.yml) using the windows pvc, and instantiate it
+
+```
+NAMESPACE="summit-demo"
+oc process -f windows-template-runonce.yml -p Name=windows | oc create -n $NAMESPACE -f -
+```
+
+### Install template
+
 - [windows template2](windows-template2.yml) using the windows2 pvc, and intended to be used for creation/deletion test
 
 ```
-oc create -f windows-template-runonce.yml -n default
 oc create -f windows-template2.yml -n openshift
 ```
 

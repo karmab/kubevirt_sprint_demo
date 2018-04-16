@@ -2,10 +2,10 @@ parameters:
  template: rhel-server-7.4-x86_64-kvm.qcow2
  domain: rhsummits.local
  docker_disk_device: vdb
- docker_disk_size: 30
- cns_disk_size: 120
+ docker_disk_size: 60
+ cns_disk_size: 60
  cns_disk_device: vdc
- master_memory: 10240
+ master_memory: 18432
  masters: 3
  cidr: 192.168.96.0/24
  user: developer
@@ -13,6 +13,7 @@ parameters:
  deploy: false
  metrics: true
  asb: true
+ org: ansibleplaybookbundle
 
 [[ domain ]]:
  type: network
@@ -43,6 +44,9 @@ master0[[ master + 1 ]]:
     mode: 700
   - path: /root/post.yml
     origin: kcli/post.yml
+    mode: 700
+  - path: /root/broker-config.yml
+    origin: kcli/broker-config.yml
     mode: 700
  scripts: 
   - kcli/heketi.sh
