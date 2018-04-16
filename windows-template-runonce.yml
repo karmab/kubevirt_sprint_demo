@@ -28,7 +28,7 @@ objects:
       kubevirt.io/domain: ${Name}
     name: ${Name}
   spec:
-    running: false
+    running: true
     selector:
       matchLabels:
         kubevirt-ovm: ovm-${Name}
