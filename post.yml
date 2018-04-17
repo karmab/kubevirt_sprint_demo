@@ -2,7 +2,7 @@
 - hosts: masters
   remote_user: root
   vars:
-    version: v0.4.1-alpha.1
+    version: v0.4.1
     admin_user: developer
     admin_password: developer
   tasks:
@@ -10,7 +10,7 @@
     selinux:
       policy: targeted
       state: permissive
-  - name: Install virtctl
+  - name: install virtctl
     get_url:
      url: "https://github.com/kubevirt/kubevirt/releases/download/{{ version }}/virtctl-{{ version }}-linux-amd64"
      dest: /usr/bin/virtctl
@@ -21,5 +21,3 @@
     with_items:
       - xorg-x11-xauth
       - virt-viewer
-  - name: enable default user
-    cmd: htpasswd -b /etc/origin/master/htpasswd {{ admin_user }} {{ admin_password }}
