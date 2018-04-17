@@ -4,7 +4,7 @@ metadata:
   name: importdisk-{{ 99999999 | random | to_uuid }}
   namespace: {{ namespace }}
   labels:
-   task: import-disk
+   task: import-disk-2
 spec:
   clusterServiceClassExternalName: {{ importvmdisk_clusterserviceclass_name }}
   clusterServicePlanExternalName: default

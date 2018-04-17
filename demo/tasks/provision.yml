@@ -16,13 +16,20 @@
 - name: Deploy vm template in openshift namespace
   command: oc apply -f /tmp/vmtemplate.yml -n openshift
 
+- name: Check if kubevirt was already provisioned
+  shell: "oc get serviceinstance -l task=kubevirt -n kube-system -o jsonpath='{ range .items[*]}{.status.conditions}' | grep successfull"
+  register: kubevirt_service_instance
+  ignore_errors: yes
+
 - name: Render kubevirt service instance
   template:
    src: "kubevirt.yml.j2"
    dest: /tmp/kubevirt.yml
+  when: kubevirt_service_instance.rc != 0
 
 - name: Deploy kubevirt service instance
   command: oc create -f /tmp/kubevirt.yml
+  when: kubevirt_service_instance.rc != 0
 
 - name: Verify that kubevirt is running
   shell: "oc get pods --field-selector=status.phase==Running -o name -n kube-system | grep virt-controller"
@@ -45,18 +52,24 @@
   changed_when: false
   when: plan == 'gluster'
 
+- name: Check if import-disk was already provisioned
+  shell: "oc get serviceinstance -l task=import-disk -n {{ namespace }} -o jsonpath='{ range .items[*]}{.status.conditions}' | grep successfull"
+  register: import_disk_service_instance
+  when: plan == 'gluster'
+  ignore_errors: yes
+
 - name: Render first import disk service instance
   template:
    src: "import-disk-apb.yml.j2"
    dest: /tmp/import-disk-apb.yml
-  when: plan == 'gluster'
+  when: plan == 'gluster' and import_disk_service_instance.rc != 0
 
 - name: Deploy first import disk service instance
   command: oc create -f /tmp/import-disk-apb.yml
-  when: plan == 'gluster'
+  when: plan == 'gluster' and import_disk_service_instance.rc != 0
 
 - name: Verify that first import finished
-  shell: "oc get pods --field-selector=status.phase==Succeeded -o name -n {{ namespace }} | grep importer-windows"
+  shell: "oc get pods --field-selector=status.phase==Succeeded -o name -n {{ namespace }} | grep importer-{{ vm_name }}"
   args:
     warn: no
   register: import1
@@ -64,10 +77,11 @@
   retries: 60
   delay: 30
   changed_when: false
-  when: plan == 'gluster'
+  when: plan == 'gluster' and import_disk_service_instance.rc != 0
 
 - name: Clean completed pods
   shell: "oc get pods --field-selector=status.phase==Succeeded -n {{ namespace }} -o name | xargs oc delete -n {{ namespace }}"
+  ignore_errors: yes
 
 - name: Render sample vm template
   template:
@@ -77,18 +91,24 @@
 - name: Deploy sample vm
   shell: "oc process -f /tmp/runonce.yml -p Name={{ vm_name }} | oc apply -f - -n {{ namespace }}"
 
+- name: Check if import-disk-2 was already provisioned
+  shell: "oc get serviceinstance -l task=import-disk-2 -n {{ namespace }} -o jsonpath='{ range .items[*]}{.status.conditions}' | grep successfull"
+  register: import_disk_2_service_instance
+  when: plan == 'gluster'
+  ignore_errors: yes
+
 - name: Render second import disk service instance
   template:
    src: "import-disk-apb-2.yml.j2"
    dest: /tmp/import-disk-apb-2.yml
-  when: plan == 'gluster'
+  when: plan == 'gluster' and import_disk_2_service_instance.rc != 0
 
 - name: Deploy second import disk service instance
   command: oc create -f /tmp/import-disk-apb-2.yml
-  when: plan == 'gluster'
+  when: plan == 'gluster' and import_disk_2_service_instance.rc != 0
 
 - name: Verify that second import finished
-  shell: "oc get pods --field-selector=status.phase==Succeeded -o name -n {{ namespace }} | grep importer-wind"
+  shell: "oc get pods --field-selector=status.phase==Succeeded -o name -n {{ namespace }} | grep importer-{{ vm_name }}2"
   args:
     warn: no
   register: import2
@@ -96,4 +116,4 @@
   retries: 60
   delay: 30
   changed_when: false
-  when: plan == 'gluster'
+  when: plan == 'gluster' and import_disk_2_service_instance.rc != 0
