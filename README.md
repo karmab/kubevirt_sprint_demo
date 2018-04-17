@@ -52,55 +52,18 @@ ansible-playbook -i /root/hosts /usr/share/ansible/openshift-ansible/playbooks/d
 
 ### post install 
 
-we disable selinux and install virtctl on all the nodes with this template
+we disable selinux and install virtctl on all the nodes with [this template](post.yml)
 
 ```
 ansible-playbook -i /root/hosts /root/post.yml
 ```
 
-### kubevirt
+### demo install 
 
-we use the existing kubevirt APB with storage-cns flavor. the following file [kubevirt-apb.yml](kubevirt-apb.yml) is used
-
-```
-oc create -f kubevirt-apb.yml
-```
-
-### deploy custom webconsole with vm entities
-
-- update webconsole deployment to use the custom image
+we install kubevirt and sample elements with this [template](deploy.yml) making use of the demo role
 
 ```
-IMAGE="jniederm/origin-web-console:demo-v7"
-oc set image deploy/webconsole webconsole=$IMAGE  -n openshift-web-console
-```
-
-- TODO: document how to build a custom image with the required patches available [here](https://happylynx.github.io/2018/04/06/custom-compilation-of-origin-web-console.html)
-
-### Import windows image as a pvc
-
-- we import windows image twice with the dedicated import-disk apb to the pvcs [windows](import-disk-apb.yml) and [windows2](import-disk-apb2.yml)
-
-```
-oc create -f import-disk-apb.yml
-oc create -f import-disk-apb2.yml
-```
-
-### Deploy a sample VM
-
-we use the [windows runonce template](windows-template-runonce.yml) using the windows pvc, and instantiate it
-
-```
-NAMESPACE="summit-demo"
-oc process -f windows-template-runonce.yml -p Name=windows | oc create -f - -n $NAMESPACE
-```
-
-### Install template
-
-- [windows template2](windows-template2.yml) using the windows2 pvc, and intended to be used for creation/deletion test
-
-```
-oc create -f windows-template2.yml -n openshift
+ansible-playbook -i /root/hosts /root/deploy.yml
 ```
 
 ## Workflow

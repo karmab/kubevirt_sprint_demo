@@ -1,0 +1,22 @@
+{%- set storage_types = {
+                  'cinder':'cinder',
+                  'default':'storage-none',
+                  'gluster':'storage-glusterfs',
+                  'storage-demo':'storage-demo',
+               }
+-%}
+apiVersion: servicecatalog.k8s.io/v1beta1
+kind: ServiceInstance
+metadata:
+  name: kubevirt-{{ 99999999 | random | to_uuid }}
+  namespace: kube-system
+  labels:
+   task: kubevirt
+spec:
+  clusterServiceClassExternalName: {{ kubevirt_clusterserviceclass_name }}
+  clusterServicePlanExternalName: {{ plan }}
+  parameters:
+    admin_user: {{ user }}
+    admin_password: {{ password }}
+    version: {{ version }}
+    storage_role: {{ storage_types[plan] }}

@@ -1,0 +1,23 @@
+---
+- name: Fetch APBs
+  command: docker pull {{ local_registry }}/mutism/{{ item }}:demo
+  with_items: "{{ apb_list }}"
+
+- name: Log in as the developer user
+  command: oc login --username {{ user }} --password {{ password }}
+
+- name: Get oc auth token
+  command: oc whoami -t
+  register: whoami_cmd
+
+- name: Login to the internal registry
+  command: docker login docker-registry.default.svc:5000 -u {{ user }} -p {{ whoami_cmd.stdout }}
+
+- name: Tag APBs to internal registry
+  command: docker tag {{ local_registry }}/mutism/{{ item }}:demo docker-registry.default.svc:5000/openshift/{{ item }}:latest
+  with_items: "{{ apb_list }}"
+
+- name: Push APBs to internal registry
+  command: docker push docker-registry.default.svc:5000/openshift/{{ item }}:latest
+  with_items: "{{ apb_list }}"
+

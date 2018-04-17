@@ -1,0 +1,37 @@
+---
+
+- name: Configure developer user as cluster admin
+  shell: |
+    oc login -u system:admin
+    oc adm policy add-cluster-role-to-user cluster-admin "{{ user }}"
+
+- name: Render sample vm template for deletion
+  template:
+   src: "{{ vm_type }}-runonce.yml.j2"
+   dest: /tmp/runonce.yml
+
+- name: Delete sample vm
+  shell: "oc process -f /tmp/runonce.yml -p Name={{ vm_name }} | oc delete -f - -n {{ namespace }}"
+  ignore_errors: yes
+
+- name: Delete vm template 
+  command: "oc delete template kubevirt-{{ vm_type }} -n openshift"
+  ignore_errors: yes
+
+- name: Delete import disk service instances
+  shell: "oc get serviceinstance -o name -n {{ namespace }} | grep importdisk | xargs oc delete -n {{ namespace }}"
+  ignore_errors: yes
+  when: plan == 'gluster'
+
+- name: Delete kubevirt service instances
+  shell: "oc get serviceinstance -l task=kubevirt -n kube-system -o name | xargs oc delete -n kube-system"
+  ignore_errors: yes
+
+- name: Delete pvcs
+  command: "oc delete pvc {{ item }} -n {{ namespace }}"
+  with_items:
+   - "{{ vm_name }}" 
+   - "{{ vm_name }}2"
+  ignore_errors: yes
+
+#-  meta: end_play

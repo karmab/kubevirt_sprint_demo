@@ -1,0 +1,15 @@
+apiVersion: servicecatalog.k8s.io/v1beta1
+kind: ServiceInstance
+metadata:
+  name: importdisk-{{ 99999999 | random | to_uuid }}
+  namespace: {{ namespace }}
+  labels:
+   task: import-disk
+spec:
+  clusterServiceClassExternalName: {{ importvmdisk_clusterserviceclass_name }}
+  clusterServicePlanExternalName: default
+  parameters:
+    admin_user: {{ user }}
+    admin_password: {{ password }}
+    pvc_name: {{ vm_name }}2
+    url: {{ image_url }}
