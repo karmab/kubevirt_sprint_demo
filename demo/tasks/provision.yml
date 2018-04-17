@@ -88,7 +88,7 @@
   when: plan == 'gluster'
 
 - name: Verify that second import finished
-  shell: "oc get pods --field-selector=status.phase==Succeeded -o name -n summit-demo | grep importer-wind"
+  shell: "oc get pods --field-selector=status.phase==Succeeded -o name -n {{ namespace }} | grep importer-wind"
   args:
     warn: no
   register: import2
