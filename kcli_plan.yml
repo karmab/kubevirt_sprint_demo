@@ -1,10 +1,9 @@
 parameters:
  template: rhel-server-7.4-x86_64-kvm.qcow2
  domain: rhsummits.local
- docker_disk_device: vdb
- docker_disk_size: 60
+ base_disk_size: 40
  cns_disk_size: 60
- cns_disk_device: vdc
+ cns_disk_device: vdb
  master_memory: 8192
  masters: 3
  cidr: 192.168.96.0/24
@@ -32,8 +31,7 @@ master0[[ master + 1 ]]:
  nets:
   - [[ domain ]]
  disks:
-  - size: 10
-  - size: [[ docker_disk_size ]]
+  - size: [[ base_disk_size ]]
   - size: [[ cns_disk_size ]]
  pool: default
  files:
