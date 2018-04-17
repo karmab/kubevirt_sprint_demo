@@ -5,7 +5,7 @@ parameters:
  docker_disk_size: 60
  cns_disk_size: 60
  cns_disk_device: vdc
- master_memory: 18432
+ master_memory: 8192
  masters: 3
  cidr: 192.168.96.0/24
  user: developer
