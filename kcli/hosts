@@ -58,6 +58,7 @@ osm_default_node_selector="region=master"
 
 [% if asb %]
 # asb
+ansible_service_broker_registry_name=dh
 ansible_service_broker_registry_organization=[[ org ]]
 ansible_service_broker_registry_type=dockerhub
 ansible_service_broker_registry_url="registry.hub.docker.com"
