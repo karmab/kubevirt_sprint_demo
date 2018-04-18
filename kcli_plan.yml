@@ -1,8 +1,8 @@
 parameters:
  template: rhel-server-7.4-x86_64-kvm.qcow2
  domain: rhsummits.local
- base_disk_size: 40
- cns_disk_size: 60
+ base_disk_size: 60
+ cns_disk_size: 100
  cns_disk_device: vdb
  master_memory: 8192
  masters: 3

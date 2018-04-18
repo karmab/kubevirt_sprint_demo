@@ -52,8 +52,11 @@ os_sdn_network_plugin_name='redhat/openshift-ovs-multitenant'
 # default node selector
 osm_default_node_selector="region=master"
 # asb
+ansible_service_broker_registry_type=dockerhub
+ansible_service_broker_registry_url="registry.hub.docker.com"
 ansible_service_broker_registry_organization=ansibleplaybookbundle
 ansible_service_broker_registry_whitelist=['.*-apb$']
+ansible_service_broker_registry_tag=latest
 openshift_hosted_etcd_storage_kind=dynamic
 openshift_hosted_etcd_storage_volume_name=etcd-vol
 #openshift_hosted_etcd_storage_access_modes=["ReadWriteOnce"]
