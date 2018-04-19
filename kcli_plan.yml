@@ -4,7 +4,7 @@ parameters:
  base_disk_size: 60
  cns_disk_size: 100
  cns_disk_device: vdb
- master_memory: 8192
+ master_memory: 16384
  masters: 3
  cidr: 192.168.96.0/24
  user: developer
