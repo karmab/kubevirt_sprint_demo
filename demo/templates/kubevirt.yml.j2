@@ -13,7 +13,7 @@ metadata:
   labels:
    task: kubevirt
 spec:
-  clusterServiceClassExternalName: {{ kubevirt_clusterserviceclass_name }}
+  clusterServiceClassExternalName: {{ kubevirt_apb }}
   clusterServicePlanExternalName: {{ plan }}
   parameters:
     admin_user: {{ user }}

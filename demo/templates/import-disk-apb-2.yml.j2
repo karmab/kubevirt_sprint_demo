@@ -6,10 +6,10 @@ metadata:
   labels:
    task: import-disk-2
 spec:
-  clusterServiceClassExternalName: {{ importvmdisk_clusterserviceclass_name }}
+  clusterServiceClassExternalName: {{ importdisk_apb }}
   clusterServicePlanExternalName: default
   parameters:
     admin_user: {{ user }}
     admin_password: {{ password }}
-    pvc_name: {{ vm_name }}2
+    pvc_name: {{ vm_type }}2
     url: {{ image_url }}

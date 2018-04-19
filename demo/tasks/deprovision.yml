@@ -11,7 +11,7 @@
    dest: /tmp/runonce.yml
 
 - name: Delete sample vm
-  shell: "oc process -f /tmp/runonce.yml -p Name={{ vm_name }} | oc delete -f - -n {{ namespace }}"
+  shell: "oc process -f /tmp/runonce.yml -p Name={{ vm_type }} | oc delete -f - -n {{ namespace }}"
   ignore_errors: yes
 
 - name: Delete vm template 
@@ -30,8 +30,8 @@
 - name: Delete pvcs
   command: "oc delete pvc {{ item }} -n {{ namespace }}"
   with_items:
-   - "{{ vm_name }}" 
-   - "{{ vm_name }}2"
+   - "{{ vm_type }}" 
+   - "{{ vm_type }}2"
   ignore_errors: yes
 
 #-  meta: end_play

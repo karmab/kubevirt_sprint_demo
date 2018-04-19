@@ -5,12 +5,9 @@ preload: true
 plan: gluster
 version: 0.4.1
 namespace: default
-vm_type: windows
-vm_name: windows
+vm_type: linux
 image_url: http://download.cirros-cloud.net/0.4.0/cirros-0.4.0-x86_64-disk.img
 local_registry: 192.168.24.1:8787
-kubevirt_clusterserviceclass_name: localregistry-virtualization
-importvmdisk_clusterserviceclass_name: localregistry-import-vm-disk-apb
 apb_list:
   - import-vm-disk-apb
   - kubevirt-apb

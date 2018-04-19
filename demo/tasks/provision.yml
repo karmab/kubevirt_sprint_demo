@@ -1,5 +1,11 @@
 ---
 
+- name: Check correct vm_type
+  assert:
+   that:
+    - "vm_type == 'windows' or vm_type == 'linux'"
+   msg: "vm_type needs to be set to windows or linux"
+
 - name: Configure developer user as cluster admin
   shell: |
     oc login -u system:admin
@@ -7,6 +13,11 @@
 
 - include_tasks: sync_apbs.yml
   when: preload 
+
+- name: Install apb tool
+  yum:
+   name: apb
+  state: present
 
 - name: Render vm template
   template:
@@ -20,6 +31,30 @@
   shell: "oc get serviceinstance -l task=kubevirt -n kube-system -o jsonpath='{ range .items[*]}{.status.conditions}' | grep successfull"
   register: kubevirt_service_instance
   ignore_errors: yes
+
+- name: Log in as the developer user
+  command: oc login --username {{ user }} --password {{ password }}
+
+- name: Relist apbs
+  command: apb relist
+
+- name: Gather apb to use for kubevirt
+  shell: "apb list | grep virtualization | awk -F' ' '{print $2}'"
+  register: kubevirt_apb_command
+
+- name: Establish kubevirt apb name
+  set_fact:
+   kubevirt_apb: "{{ kubevirt_apb_command.stdout }}"
+
+- name: Debug kubevirt apb name
+  debug:
+   msg: "kubevirt_apb has value {{ kubevirt_apb }}"
+
+- name: Check kubevirt apb is there
+  assert:
+   that:
+    - "kubevirt_apb != ''"
+   msg: "no kubevirt apb was found"
 
 - name: Render kubevirt service instance
   template:
@@ -58,6 +93,27 @@
   when: plan == 'gluster'
   ignore_errors: yes
 
+#- name: Relist apbs
+#  command: apb relist
+
+- name: Gather apb to use for importdisk-apb
+  shell: "apb list | grep import-vm-disk-apb | awk -F' ' '{print $2}'"
+  register: importdisk_apb_command
+
+- name: Establish importdisk apb name
+  set_fact:
+   importdisk_apb: "{{ importdisk_apb_command.stdout }}"
+
+- name: Debug importdisk apb name
+  debug:
+   msg: "importdisk_apb has value {{ importdisk_apb }}"
+
+- name: Check importdisk apb is there
+  assert:
+   that:
+    - "importdisk_apb != ''"
+   msg: "no importdisk apb was found"
+
 - name: Render first import disk service instance
   template:
    src: "import-disk-apb.yml.j2"
@@ -69,7 +125,7 @@
   when: plan == 'gluster' and import_disk_service_instance.rc != 0
 
 - name: Verify that first import finished
-  shell: "oc get pods --field-selector=status.phase==Succeeded -o name -n {{ namespace }} | grep importer-{{ vm_name }}"
+  shell: "oc get pods --field-selector=status.phase==Succeeded -o name -n {{ namespace }} | grep importer-{{ vm_type }}"
   args:
     warn: no
   register: import1
@@ -89,7 +145,7 @@
    dest: /tmp/runonce.yml
 
 - name: Deploy sample vm
-  shell: "oc process -f /tmp/runonce.yml -p Name={{ vm_name }} | oc apply -f - -n {{ namespace }}"
+  shell: "oc process -f /tmp/runonce.yml -p Name={{ vm_type }} | oc apply -f - -n {{ namespace }}"
 
 - name: Check if import-disk-2 was already provisioned
   shell: "oc get serviceinstance -l task=import-disk-2 -n {{ namespace }} -o jsonpath='{ range .items[*]}{.status.conditions}' | grep successfull"
@@ -108,7 +164,7 @@
   when: plan == 'gluster' and import_disk_2_service_instance.rc != 0
 
 - name: Verify that second import finished
-  shell: "oc get pods --field-selector=status.phase==Succeeded -o name -n {{ namespace }} | grep importer-{{ vm_name }}2"
+  shell: "oc get pods --field-selector=status.phase==Succeeded -o name -n {{ namespace }} | grep importer-{{ vm_type }}2"
   args:
     warn: no
   register: import2
