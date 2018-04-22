@@ -13,6 +13,7 @@ metadata:
     openshift.io/long-description: Wingtip Toys Application VM
     openshift.io/provider-display-name: Red Hat, Inc.
     openshift.io/support-url: https://access.redhat.com
+    tags: virtualmachine
   labels:
     kubevirt.io/os: win2k16
     miq.github.io/kubevirt-is-vm-template: "true"
@@ -112,6 +113,6 @@ parameters:
 - description: Amount of memory
   name: Memory
   value: 8192Mi
-- description: Amount of cores
+- description: Number of cores
   name: Cpu_cores
   value: "4"
