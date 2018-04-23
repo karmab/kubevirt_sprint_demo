@@ -7,7 +7,7 @@ version: 0.4.1
 namespace: default
 vm_type: linux
 image_url: http://download.cirros-cloud.net/0.4.0/cirros-0.4.0-x86_64-disk.img
-local_registry: 192.168.24.1:8787
+local_registry: docker.io
 apb_list:
   - import-vm-disk-apb
   - kubevirt-apb
