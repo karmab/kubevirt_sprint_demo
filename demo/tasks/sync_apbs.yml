@@ -1,6 +1,6 @@
 ---
 - name: Fetch APBs
-  command: docker pull {{ local_registry }}/mutism/{{ item }}:demo
+  command: docker pull {{ registry }}/{{ repository }}/{{ item }}:demo
   with_items: "{{ apb_list }}"
 
 - name: Log in as the developer user
@@ -14,7 +14,7 @@
   command: docker login docker-registry.default.svc:5000 -u {{ user }} -p {{ whoami_cmd.stdout }}
 
 - name: Tag APBs to internal registry
-  command: docker tag {{ local_registry }}/mutism/{{ item }}:demo docker-registry.default.svc:5000/openshift/{{ item }}:latest
+  command: docker tag {{ registry }}/{{ repository }}/{{ item }}:demo docker-registry.default.svc:5000/openshift/{{ item }}:latest
   with_items: "{{ apb_list }}"
 
 - name: Push APBs to internal registry

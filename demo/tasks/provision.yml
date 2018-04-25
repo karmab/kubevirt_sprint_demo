@@ -1,11 +1,5 @@
 ---
 
-- name: Check correct vm_type
-  assert:
-   that:
-    - "vm_type == 'windows' or vm_type == 'linux'"
-   msg: "vm_type needs to be set to windows or linux"
-
 - name: Configure developer user as cluster admin
   shell: |
     oc login -u system:admin
@@ -19,13 +13,11 @@
    name: apb
   state: present
 
-- name: Render vm template
-  template:
-   src: "{{ vm_type }}-template.yml.j2"
-   dest: /tmp/vmtemplate.yml
-
-- name: Deploy vm template in openshift namespace
-  command: oc apply -f /tmp/vmtemplate.yml -n openshift
+- name: install virtctl
+  get_url:
+   url: "https://github.com/kubevirt/kubevirt/releases/download/v{{ version }}/virtctl-v{{ version }}-linux-amd64"
+   dest: /usr/bin/virtctl
+   mode: 0700
 
 - name: Check if kubevirt was already provisioned
   shell: "oc get serviceinstance -l task=kubevirt -n kube-system -o jsonpath='{ range .items[*]}{.status.conditions}' | grep successfull"
@@ -87,89 +79,18 @@
   changed_when: false
   when: plan == 'gluster'
 
-- name: Check if import-disk was already provisioned
-  shell: "oc get serviceinstance -l task=import-disk -n {{ namespace }} -o jsonpath='{ range .items[*]}{.status.conditions}' | grep successfull"
-  register: import_disk_service_instance
-  when: plan == 'gluster'
-  ignore_errors: yes
-
-#- name: Relist apbs
-#  command: apb relist
-
-- name: Gather apb to use for importdisk-apb
-  shell: "apb list | grep import-vm-disk-apb | awk -F' ' '{print $2}'"
-  register: importdisk_apb_command
-
-- name: Establish importdisk apb name
-  set_fact:
-   importdisk_apb: "{{ importdisk_apb_command.stdout }}"
-
-- name: Debug importdisk apb name
-  debug:
-   msg: "importdisk_apb has value {{ importdisk_apb }}"
-
-- name: Check importdisk apb is there
-  assert:
-   that:
-    - "importdisk_apb != ''"
-   msg: "no importdisk apb was found"
-
-- name: Render first import disk service instance
+- name: Render vm templates
   template:
-   src: "import-disk-apb.yml.j2"
-   dest: /tmp/import-disk-apb.yml
-  when: plan == 'gluster' and import_disk_service_instance.rc != 0
+   src: "{{ item }}-template.yml.j2"
+   dest: "/tmp/vmtemplate-{{item}}.yml"
+  with_items:
+   - linux
+   - windows
 
-- name: Deploy first import disk service instance
-  command: oc create -f /tmp/import-disk-apb.yml
-  when: plan == 'gluster' and import_disk_service_instance.rc != 0
+- name: Deploy vm template in openshift namespace
+  command: "oc apply -f /tmp/vmtemplate-{{ item }}.yml -n openshift"
+  with_items:
+   - linux
+   - windows
 
-- name: Verify that first import finished
-  shell: "oc get pods --field-selector=status.phase==Succeeded -o name -n {{ namespace }} | grep importer-{{ vm_type }}"
-  args:
-    warn: no
-  register: import1
-  until: import1.rc == 0
-  retries: 60
-  delay: 30
-  changed_when: false
-  when: plan == 'gluster' and import_disk_service_instance.rc != 0
-
-- name: Clean completed pods
-  shell: "oc get pods --field-selector=status.phase==Succeeded -n {{ namespace }} -o name | xargs oc delete -n {{ namespace }}"
-  ignore_errors: yes
-
-- name: Render sample vm template
-  template:
-   src: "{{ vm_type }}-runonce.yml.j2"
-   dest: /tmp/runonce.yml
-
-- name: Deploy sample vm
-  shell: "oc process -f /tmp/runonce.yml -p Name={{ vm_type }} | oc apply -f - -n {{ namespace }}"
-
-- name: Check if import-disk-2 was already provisioned
-  shell: "oc get serviceinstance -l task=import-disk-2 -n {{ namespace }} -o jsonpath='{ range .items[*]}{.status.conditions}' | grep successfull"
-  register: import_disk_2_service_instance
-  when: plan == 'gluster'
-  ignore_errors: yes
-
-- name: Render second import disk service instance
-  template:
-   src: "import-disk-apb-2.yml.j2"
-   dest: /tmp/import-disk-apb-2.yml
-  when: plan == 'gluster' and import_disk_2_service_instance.rc != 0
-
-- name: Deploy second import disk service instance
-  command: oc create -f /tmp/import-disk-apb-2.yml
-  when: plan == 'gluster' and import_disk_2_service_instance.rc != 0
-
-- name: Verify that second import finished
-  shell: "oc get pods --field-selector=status.phase==Succeeded -o name -n {{ namespace }} | grep importer-{{ vm_type }}2"
-  args:
-    warn: no
-  register: import2
-  until: import2.rc == 0
-  retries: 60
-  delay: 30
-  changed_when: false
-  when: plan == 'gluster' and import_disk_2_service_instance.rc != 0
+- include_tasks: import_vm.yml

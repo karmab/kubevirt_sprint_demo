@@ -21,7 +21,8 @@ a Running *openshift+gluster* cluster with ansible service broker enabled
 |vm_type|windows |<ul><li>linux</li><li>windows</li></ul>|Ovm name to create.|
 |action|provision| <ul><li>provision</li><li>deprovision</li></ul>|Action to perform.|
 |plan | gluster | <ul><li>storage-none</li><li>storage-demo</li><li>storage-glusterfs</li></ul> | Storage role to install|
-|local_registry|192.168.24.1:8787||registry where to grab apbs|
+|registry|docker.io||registry where to grab apbs|
+|repository|mutism||repository where to grab apbs|
 |preload|true||Whether to preload apbs to openshift registry|
 |image_url|http://download.cirros-cloud.net/0.4.0/cirros-0.4.0-x86_64-disk.img||Url where to download base OS|
 |apb_list|import-vm-disk-apb, kubevirt-apb, mssql-apb||List of apbs to push|

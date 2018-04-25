@@ -1,0 +1,13 @@
+---
+
+- name: Configure developer user as cluster admin
+  shell: |
+    oc login -u system:admin
+    oc adm policy add-cluster-role-to-user cluster-admin "{{ user }}"
+
+- include_tasks: sync_apbs.yml
+  when: preload 
+
+- include_tasks: kubevirt.yml
+
+- include_tasks: import_vm.yml

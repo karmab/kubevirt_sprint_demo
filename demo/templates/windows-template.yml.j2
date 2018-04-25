@@ -2,15 +2,14 @@ apiVersion: template.openshift.io/v1
 kind: Template
 labels:
   app: kubevirt-windows
-  demo: windows2
+  demo: windows
   template: kubevirt-windows-template
-message: Wingtip Toys Application windows VM has been created in your project
+message: Windows VM has been created in your project
 metadata:
   annotations:
-    description: Wingtip Toys Application VM
-    openshift.io/display-name: Wingtip Toys Application VM
+    description: Windows VM
+    openshift.io/display-name: Windows VM
     openshift.io/documentation-url: https://docs.openshift.org/latest
-    openshift.io/long-description: Wingtip Toys Application Virtual Machine, a sample application designed to show specific ASP.NET concepts and features available to ASP.NET web developers.
     openshift.io/provider-display-name: Red Hat, Inc.
     openshift.io/support-url: https://access.redhat.com
     tags: virtualmachine
@@ -29,7 +28,7 @@ objects:
       kubevirt.io/os: win2k16
     name: ${Name}
   spec:
-    running: true
+    running: {{ run }}
     selector:
       matchLabels:
         kubevirt-ovm: ovm-${Name}
@@ -50,7 +49,7 @@ objects:
                 tickPolicy: catchup
             utc: {}
           cpu:
-            cores: 4
+            cores: ${{'{{'}}Cores{{'}}'}}
           devices:
             disks:
             - name: disk0
@@ -71,7 +70,7 @@ objects:
         volumes:
         - name: disk0-pvc
           persistentVolumeClaim:
-            claimName: windows2
+            claimName: ${Pvc}
 - apiVersion: v1
   kind: Service
   metadata:
@@ -116,3 +115,6 @@ parameters:
 - description: Number of cores
   name: Cores
   value: "4"
+- description: Pvc to use
+  name: Pvc
+  value: "windows"

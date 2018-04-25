@@ -1,0 +1,75 @@
+---
+
+- name: Relist apbs
+  command: apb relist
+
+- name: Gather apb to use for importdisk-apb
+  shell: "apb list | grep import-vm-disk-apb | awk -F' ' '{print $2}'"
+  register: importdisk_apb_command
+
+- name: Establish importdisk apb name
+  set_fact:
+   importdisk_apb: "{{ importdisk_apb_command.stdout }}"
+
+- name: Debug importdisk apb name
+  debug:
+   msg: "importdisk_apb has value {{ importdisk_apb }}"
+
+- name: Check importdisk apb is there
+  assert:
+   that:
+    - "importdisk_apb != ''"
+   msg: "no importdisk apb was found"
+
+- name: Check vm name is defined
+  assert:
+   that:
+    - "name is defined"
+   msg: "vm name needs to be defined"
+
+- name: Check correct vm type
+  assert:
+   that:
+   - "type == 'windows' or type == 'linux'"
+   msg: "vm type needs to be set to windows or linux"
+
+- name: Check vm url is defined
+  assert:
+   that:
+    - "url is defined"
+   msg: "vm url needs to be set to a value"
+
+- name: Check if import-disk was already provisioned
+  shell: "oc get serviceinstance importdisk-{{ name }} -n {{ namespace }} -o jsonpath='{.status.conditions}' | grep successfull"
+  register: "import_disk_service_instance"
+  when: "plan == 'gluster'"
+  ignore_errors: yes
+
+- name: Render import disk service instance
+  template:
+   src: "import-disk-apb.yml.j2"
+   dest: "/tmp/import-disk-apb.yml"
+  when: "plan == 'gluster' and import_disk_service_instance.rc != 0"
+
+- name: Deploy import disk service instance
+  command: "oc create -f /tmp/import-disk-apb.yml"
+  when: "plan == 'gluster' and import_disk_service_instance.rc != 0"
+
+- name: Verify that imports finished
+  shell: "oc get pods --field-selector=status.phase==Succeeded -o name -n {{ namespace }} | grep importer-{{ name }}"
+  args:
+    warn: no
+  register: "import"
+  until: "import.rc == 0"
+  retries: 60
+  delay: 30
+  changed_when: false
+  when: "plan == 'gluster' and import_disk_service_instance.rc != 0"
+
+- name: Clean completed pods
+  shell: "oc get pods --field-selector=status.phase==Succeeded -n {{ namespace }} -o name | xargs oc delete -n {{ namespace }}"
+  ignore_errors: yes
+
+- name: Create vms
+  shell: "oc process kubevirt-{{ type }} -p Name={{ name }} -p Pvc={{ name }} -n openshift | oc apply -f - -n {{ namespace }}"
+  when: create
