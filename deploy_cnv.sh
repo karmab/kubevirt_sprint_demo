@@ -1,3 +1,4 @@
 #!/bin/bash
-URL="http://zzz.yy.es/f.img"
-ansible-playbook -i /root/hosts -e "name=galaxtux type=linux url=$URL namespace=default preload=true" deploy.yaml
+URL="https://download.fedoraproject.org/pub/fedora/linux/releases/27/CloudImages/x86_64/images/Fedora-Cloud-Base-27-1.6.x86_64.qcow2"
+PUBKEY=`cat ~/.ssh/id_rsa.pub`
+ansible-playbook -i /root/hosts -e "name=fedora type=linux url=$URL public_key=\"$PUBKEY\" namespace=default preload=true" deploy.yml

@@ -47,6 +47,12 @@ objects:
                 bus: virtio
               name: disk0
               volumeName: disk0-pvc
+{% if public_key is defined %}
+            - disk:
+                bus: virtio
+              name: cloudinitdisk
+              volumeName: cloudinitvolume
+{% endif %}
           machine:
             type: q35
           resources:
@@ -56,6 +62,13 @@ objects:
         - name: disk0-pvc
           persistentVolumeClaim:
             claimName: ${Pvc}
+{% if public_key is defined %}
+        - name: cloudinitvolume
+          cloudInitNoCloud:
+            userData: |
+              ssh-authorized-keys:
+              - {{ public_key }}
+{% endif %}
 - apiVersion: v1
   kind: Service
   metadata:
