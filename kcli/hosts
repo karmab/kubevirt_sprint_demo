@@ -18,7 +18,7 @@ openshift_image_tag=v3.9
 openshift_repos_enable_testing=True
 # web console
 openshift_web_console_prefix=jniederm/origin-
-openshift_web_console_version=demo-v9
+openshift_web_console_version=demo-v12
 # cns
 openshift_storage_glusterfs_namespace=app-storage
 openshift_storage_glusterfs_storageclass=true
