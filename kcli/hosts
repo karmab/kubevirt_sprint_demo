@@ -54,7 +54,7 @@ openshift_registry_selector="region=master"
 os_sdn_network_plugin_name='redhat/openshift-ovs-multitenant'
 
 # default node selector 
-osm_default_node_selector="region=master"
+osm_default_node_selector="zone=east"
 
 [% if asb %]
 # asb
