@@ -1,0 +1,42 @@
+- hosts: all
+  gather_facts: no
+  tasks:
+  - name: Subscribe vms
+    command: subscription-manager repos --enable={{ item }}
+    with_items:
+    - rhel-7-server-extras-rpms
+    - rhel-7-server-ose-3.9-rpms
+    - rhel-7-fast-datapath-rpms
+    - rhel-7-server-ansible-2.4-rpms
+  - name: Set authorized key took from file
+    authorized_key:
+      user: root
+      state: present
+      key: "{{ lookup('file', 'vagrant_rsa.pub') }}"
+
+- hosts: masters[0]
+  gather_facts: no
+  tasks:
+  - name: Install openshift-ansible
+    yum:
+      name: openshift-ansible
+      state: present
+  - name: Remove host_key_checking
+    lineinfile:
+      path: /etc/ansible/ansible.cfg
+      insertafter: '#host_key_checking'
+      regexp: '^host_key_checking'
+      line: 'host_key_checking = False'
+  - name: Copy ssh key to master
+    copy:
+      src: vagrant_rsa
+      dest: /root/id_rsa
+      mode: 0600
+  - name: Copy inventory
+    copy:
+      src: hosts
+      dest: /root/hosts
+  - name: Openshift prerequisites
+    shell: ansible-playbook --key-file "/root/id_rsa" -i /root/hosts /playbooks/playbooks/prerequisites.yaml | tee /root/prerequisites.log
+  - name: Openshift install
+    shell: ansible-playbook --key-file "/root/id_rsa" -i /root/hosts /playbooks/playbooks/deploy_cluster.yaml | tee /root/deploy.log

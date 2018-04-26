@@ -44,8 +44,8 @@ openshift_master_htpasswd_users={'developer': '$apr1$3OQDYj9G$zrxRzJKiy7XqARTrTA
 # or to one or all of the masters defined in the inventory if no load
 # balancer is present.
 openshift_master_cluster_method=native
-openshift_master_cluster_hostname=kubedemo1.cloud.lab.eng.bos.redhat.com
-openshift_master_cluster_public_hostname=kubedemo1.cloud.lab.eng.bos.redhat.com
+openshift_master_cluster_hostname=kubedemo1.192.168.201.2.xip.io
+openshift_master_cluster_public_hostname=kubedemo1.192.168.201.2.xip.io
 openshift_router_selector="region=master"
 openshift_registry_selector="region=master"
 os_sdn_network_plugin_name='redhat/openshift-ovs-multitenant'
@@ -72,24 +72,24 @@ openshift_node_kubelet_args={'pods-per-core': ['10'], 'max-pods': ['250'], 'imag
 #osm_controller_lease_ttl=30
 # enable ntp on masters to ensure proper failover
 openshift_clock_enabled=true
-openshift_master_default_subdomain=apps.cloud.lab.eng.bos.redhat.com
+openshift_master_default_subdomain=192.168.201.2.xip.io
 openshift_hosted_infra_selector="region=master"
 # host group for masters
 [masters]
-kubedemo1.cloud.lab.eng.bos.redhat.com
-kubedemo2.cloud.lab.eng.bos.redhat.com
-kubedemo3.cloud.lab.eng.bos.redhat.com
+kubedemo1
+kubedemo2
+kubedemo3
 # host group for etcd
 [etcd]
-kubedemo1.cloud.lab.eng.bos.redhat.com
-kubedemo2.cloud.lab.eng.bos.redhat.com
-kubedemo3.cloud.lab.eng.bos.redhat.com
+kubedemo1
+kubedemo2
+kubedemo3
 [glusterfs]
-kubedemo1.cloud.lab.eng.bos.redhat.com glusterfs_devices='[ "/dev/sdo" ]'
-kubedemo2.cloud.lab.eng.bos.redhat.com glusterfs_devices='[ "/dev/sdo" ]'
-kubedemo3.cloud.lab.eng.bos.redhat.com glusterfs_devices='[ "/dev/sdo" ]'
+kubedemo1 glusterfs_devices='[ "/dev/vdb" ]'
+kubedemo2 glusterfs_devices='[ "/dev/vdb" ]'
+kubedemo3 glusterfs_devices='[ "/dev/vdb" ]'
 # host group for nodes, includes region info
 [nodes]
-kubedemo1.cloud.lab.eng.bos.redhat.com openshift_node_labels="{'region': 'master', 'zone': 'east'}"
-kubedemo2.cloud.lab.eng.bos.redhat.com openshift_node_labels="{'region': 'master', 'zone': 'east'}"
-kubedemo3.cloud.lab.eng.bos.redhat.com openshift_node_labels="{'region': 'master', 'zone': 'east'}"
+kubedemo1 openshift_node_labels="{'region': 'master', 'zone': 'east'}"
+kubedemo2 openshift_node_labels="{'region': 'master', 'zone': 'east'}"
+kubedemo3 openshift_node_labels="{'region': 'master', 'zone': 'east'}"
