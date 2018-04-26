@@ -1,7 +1,9 @@
 action: provision
 user: developer
 password: developer
-preload: true
+sync: true
+kubevirt: true
+import: true
 plan: gluster
 version: 0.4.1
 registry: docker.io

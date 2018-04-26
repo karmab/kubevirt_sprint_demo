@@ -1,0 +1,6 @@
+#cloud-config
+hostname: {{ name }}
+ssh_pwauth: True
+disable_root: false
+ssh_authorized_keys:
+- {{ public_key }}

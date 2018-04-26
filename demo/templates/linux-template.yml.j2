@@ -7,10 +7,10 @@ labels:
 message: linux VM has been created in your project
 metadata:
   annotations:
-    description: linux  VM
-    openshift.io/display-name: linux VM
+    description: Kubevirt linux VM
+    openshift.io/display-name: Kubevirt linux VM
     openshift.io/documentation-url: https://docs.openshift.org/latest
-    openshift.io/long-description: linux VM
+    openshift.io/long-description: Kubevirt linux VM
     openshift.io/provider-display-name: Red Hat, Inc.
     openshift.io/support-url: https://access.redhat.com
     tags: virtualmachine
@@ -47,7 +47,7 @@ objects:
                 bus: virtio
               name: disk0
               volumeName: disk0-pvc
-{% if public_key is defined %}
+{% if cloudinit is defined %}
             - disk:
                 bus: virtio
               name: cloudinitdisk
@@ -62,12 +62,10 @@ objects:
         - name: disk0-pvc
           persistentVolumeClaim:
             claimName: ${Pvc}
-{% if public_key is defined %}
+{% if cloudinit is defined %}
         - name: cloudinitvolume
           cloudInitNoCloud:
-            userData: |
-              ssh-authorized-keys:
-              - {{ public_key }}
+            userDataBase64: {{ cloudinit | b64encode }}
 {% endif %}
 - apiVersion: v1
   kind: Service

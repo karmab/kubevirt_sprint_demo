@@ -1,0 +1,19 @@
+---
+
+- name: Check vm name is defined
+  assert:
+   that:
+    - "name is defined"
+   msg: "vm name needs to be defined"
+
+- name: Check correct vm type
+  assert:
+   that:
+   - "type == 'windows' or type == 'linux'"
+   msg: "vm type needs to be set to windows or linux"
+
+- name: Check vm url is defined
+  assert:
+   that:
+    - "url is defined"
+   msg: "vm url needs to be set to a value"

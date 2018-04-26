@@ -5,11 +5,11 @@
     oc login -u system:admin
     oc adm policy add-cluster-role-to-user cluster-admin "{{ user }}"
 
+- include_tasks: check_vm.yml
+  
 - name: Delete vms
-  shell: "oc process kubevirt-{{ item.type }} -p Name={{ item.name }} | oc delete -f - -n {{ item.namespace }}"
+  shell: "oc process kubevirt-{{ type }} -p Name={{ name }} | oc delete -f - -n {{ namespace }}"
   ignore_errors: yes
-  with_items: "{{ vms | selectattr('run',true) }}"
-  when: vms is defined and vms
 
 - name: Delete vm templates
   command: "oc delete template kubevirt-{{ item }} -n openshift"
@@ -17,12 +17,11 @@
   with_items:
   - linux
   - windows
+  - import
 
 - name: Delete import disk service instances
-  shell: "oc delete serviceinstance {{ item.name }} -n {{ item.namespace }}"
+  shell: "oc delete serviceinstance {{ name }} -n {{ namespace }}"
   ignore_errors: yes
-  with_items: "{{ vms }}"
-  when: vms is defined and vms and plan == 'gluster'
 
 #- name: Delete pvcs
 #  command: "oc delete pvc {{ item.name }} -n {{ namespace }}"
@@ -30,7 +29,7 @@
 #  ignore_errors: yes
 
 - name: Delete kubevirt service instances
-  shell: "oc get serviceinstance -l task=kubevirt -n kube-system -o name | xargs oc delete -n kube-system"
+  shell: "oc get serviceinstance -l task=kubevirt -n kube-system -o name | xargs -r oc delete -n kube-system"
   ignore_errors: yes
 
 #-  meta: end_play

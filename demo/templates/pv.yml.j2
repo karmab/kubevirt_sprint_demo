@@ -1,0 +1,18 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  annotations:
+  labels:
+    app: kubevirt-{{ type }}-local
+    demo: windows2-local
+  name: {{ name }}-local-{{ namespace }}
+spec:
+  accessModes:
+  - ReadWriteOnce
+  capacity:
+    storage: 54Gi
+  hostPath:
+    path: {{ path }}/{{ name }}-local-{{ namespace }}
+    type: ""
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: manual

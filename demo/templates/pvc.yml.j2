@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  annotations:
+  labels:
+    app: kubevirt-{{ type }}-local
+    demo: {{ name }}
+  name: {{ name }}
+  namespace: {{ namespace }}
+spec:
+  accessModes:
+  - ReadWriteOnce
+  resources:
+    requests:
+      storage: 54Gi
+  storageClassName: manual
+  volumeName: {{ name }}-local-{{ namespace}}
